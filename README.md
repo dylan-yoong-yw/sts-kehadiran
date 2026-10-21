@@ -1,2 +1,3 @@
-# tuition-management-app
-Flutter-based Tuition Management App for private tuition teachers.
+# STS-Kehadiran-School-Attendance-and-Timetable-Reminder-App
+Morning attendance supports the school’s daily administration and student follow-up. The client described a workflow in which class teachers use paper, and school administrators later key the information into an existing system. STS Kehadiran will make the teacher’s record available digitally to the administrator, reducing dependence on physical handover.
+Developed by team Seventeen under TMA3084 Software Engineering Laboratory. Seventeen is a five-member UNIMAS student team comprising Dylan Yoong Yuk Wen, Eric Brandon Anak Barnabas, Gabriel Gerrard Anak Tagong, Jaymexnuell Anak James and Stephanie Abby Anak Joseph.
