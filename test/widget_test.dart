@@ -1,30 +1,18 @@
 import 'dart:io';
-import 'dart:convert';
 
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sts_kehadiran/main.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
-    // Use the SDK's real font so text wrapping matches the phone, not the
-    // intentionally wide Ahem font normally used by widget tests.
-    final configFile = File('.dart_tool/package_config.json');
-    final config =
-        jsonDecode(await configFile.readAsString()) as Map<String, dynamic>;
-    final packages = config['packages'] as List<dynamic>;
-    final flutterPackage = packages.firstWhere(
-      (entry) => entry['name'] == 'flutter',
-    ) as Map<String, dynamic>;
-    final packageUri = configFile.absolute.uri.resolve(
-      flutterPackage['rootUri'] as String,
-    );
-    final sdk = Directory.fromUri(packageUri).parent.parent;
+    // Real font metrics keep the no-scroll layout assertions representative of
+    // the app. Ahem, Flutter's default test font, wraps text much more widely.
     final font = FontLoader('Roboto');
     font.addFont(
-      File('${sdk.path}/bin/cache/artifacts/material_fonts/roboto-regular.ttf')
+      File('test/fixtures/fonts/Roboto-Regular.ttf')
           .readAsBytes()
           .then(ByteData.sublistView),
     );
