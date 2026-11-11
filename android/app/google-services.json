@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "732775644143",
+    "project_id": "sts-kehadiran",
+    "storage_bucket": "sts-kehadiran.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:732775644143:android:a64a84d71a934316d6d41a",
+        "android_client_info": {
+          "package_name": "my.edu.unimas.stskehadiran"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAk2tNh31ikb1eFqrb8rosiCvSA4-rA-BM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
