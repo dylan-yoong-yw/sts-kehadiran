@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
-/// Shared rounded surface used by the dashboard cards.
+import '../core/theme.dart';
+
+/// Shared rounded surface used by the dashboard and login cards.
 class DashboardCard extends StatelessWidget {
   const DashboardCard({
     super.key,
     required this.color,
     required this.child,
-    this.padding = const EdgeInsets.all(24),
+    this.padding = const EdgeInsets.all(AppSpacing.card),
   });
 
   final Color color;
@@ -14,22 +16,12 @@ class DashboardCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => SizedBox(
     width: double.infinity,
-    padding: padding,
-    decoration: BoxDecoration(
+    child: Card(
       color: color,
-      borderRadius: BorderRadius.circular(24),
-      border: Border.all(color: Colors.white, width: 2),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x180D483A),
-          blurRadius: 12,
-          offset: Offset(0, 6),
-        ),
-      ],
+      child: Padding(padding: padding, child: child),
     ),
-    child: child,
   );
 }
 
