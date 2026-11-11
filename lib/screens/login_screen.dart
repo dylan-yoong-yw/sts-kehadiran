@@ -125,6 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Text(
                           'Don’t have an account yet?',
+                          textAlign: TextAlign.center,
                           style: text.bodyLarge,
                         ),
                         TextButton(
