@@ -130,20 +130,18 @@ abstract final class AppTheme {
   );
 
   /// [theme] with the login screen's fields: white fill, dark border and
-  /// [AppSizes.controlHeight] tall at the default text size, so they line
-  /// up with the primary button.
+  /// at least [AppSizes.controlHeight] tall, so they line up with the
+  /// primary button. Larger system text makes them taller.
   static ThemeData loginFields(ThemeData theme) {
-    final inputText = theme.textTheme.bodyLarge!;
-    final lineHeight = inputText.fontSize! * (inputText.height ?? 1);
-    final verticalPadding = (AppSizes.controlHeight - lineHeight) / 2;
     OutlineInputBorder border(Color color, [double width = 1.5]) =>
         _border(color, width: width, radius: 12);
     return theme.copyWith(
       inputDecorationTheme: theme.inputDecorationTheme.copyWith(
         fillColor: Colors.white,
-        contentPadding: EdgeInsets.symmetric(
+        constraints: const BoxConstraints(minHeight: AppSizes.controlHeight),
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
-          vertical: verticalPadding,
+          vertical: 16,
         ),
         enabledBorder: border(AppColors.darkGreen),
         focusedBorder: border(AppColors.green, 2),

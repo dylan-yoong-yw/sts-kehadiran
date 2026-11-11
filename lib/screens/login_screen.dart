@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
 import '../services/auth_service.dart';
-import '../widgets/dashboard_widgets.dart';
 import '../widgets/fill_scroll_view.dart';
 
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, this.now});
-
-  /// Clock used for the greeting; overridable in tests.
-  final DateTime Function()? now;
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -30,13 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  String get _greeting {
-    final hour = (widget.now ?? DateTime.now)().hour;
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
   }
 
   String? _validateEmail(String? value) {
@@ -94,67 +83,63 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _openSignUp() {}
+
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
-            // Header at the top, footer at the bottom and the cards centred
-            // between them; scrolls when the content is taller (short
-            // phones, large system text, open keyboard).
-            child: FillScrollView(
-              scrollKey: const Key('login-scroll'),
-              sections: [
-                Padding(
-                  padding: const EdgeInsets.only(top: AppSpacing.section),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.school,
-                        size: 28,
-                        color: AppColors.darkGreen,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'STS Kehadiran',
-                          style: text.titleLarge?.copyWith(
-                            color: AppColors.darkGreen,
-                          ),
+    final theme = Theme.of(context);
+    final text = theme.textTheme;
+    final linkStyle = text.labelLarge?.copyWith(
+      decoration: TextDecoration.underline,
+    );
+    return DecoratedBox(
+      key: const Key('login-background'),
+      decoration: BoxDecoration(gradient: AppGradients.login),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              // The form is centred in the space above the pinned sign-up
+              // line; it scrolls when the content is taller (short phones,
+              // large system text, open keyboard).
+              child: FillScrollView(
+                scrollKey: const Key('login-scroll'),
+                sections: [
+                  const SizedBox(height: AppSpacing.section),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Theme(
+                      data: AppTheme.loginFields(theme),
+                      child: _buildForm(text, linkStyle),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.section),
+                    child: Wrap(
+                      key: const Key('login-footer'),
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          'Don’t have an account yet?',
+                          style: text.bodyLarge,
                         ),
-                      ),
-                    ],
+                        TextButton(
+                          key: const Key('login-sign-up'),
+                          onPressed: _busy ? null : _openSignUp,
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.darkGreen,
+                            textStyle: linkStyle,
+                          ),
+                          child: const Text('Sign up'),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _WelcomeCard(greeting: _greeting),
-                      const SizedBox(height: AppSpacing.section),
-                      DashboardCard(
-                        key: const Key('login-form-card'),
-                        color: Colors.white,
-                        child: _buildForm(text),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.section),
-                  child: Text(
-                    'For registered teachers only. Contact your school admin '
-                    'if you need an account.',
-                    key: const Key('login-footer'),
-                    textAlign: TextAlign.center,
-                    style: text.bodySmall?.copyWith(color: AppColors.muted),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -162,14 +147,19 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildForm(TextTheme text) => Form(
+  Widget _buildForm(TextTheme text, TextStyle? linkStyle) => Form(
     key: _formKey,
     child: AutofillGroup(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Sign in', style: text.titleMedium),
-          const SizedBox(height: AppSpacing.section),
+          Text(
+            'STS KEHADIRAN',
+            key: const Key('login-title'),
+            textAlign: TextAlign.center,
+            style: text.displaySmall?.copyWith(color: AppColors.darkGreen),
+          ),
+          const SizedBox(height: 32),
           TextFormField(
             key: const Key('login-email'),
             controller: _emailController,
@@ -179,10 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.email],
             autocorrect: false,
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              prefixIcon: Icon(Icons.email_outlined),
-            ),
+            decoration: const InputDecoration(labelText: 'Email'),
             validator: _validateEmail,
           ),
           const SizedBox(height: AppSpacing.section),
@@ -197,7 +184,6 @@ class _LoginScreenState extends State<LoginScreen> {
             onFieldSubmitted: (_) => _signIn(),
             decoration: InputDecoration(
               labelText: 'Password',
-              prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
                 tooltip: _obscurePassword ? 'Show password' : 'Hide password',
                 onPressed: () =>
@@ -213,16 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
             validator: (value) =>
                 (value ?? '').isEmpty ? 'Please enter your password.' : null,
           ),
-          const SizedBox(height: 4),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: _busy ? null : _resetPassword,
-              style: TextButton.styleFrom(foregroundColor: AppColors.accent),
-              child: const Text('Forgot password?'),
-            ),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.section),
           if (_error != null) ...[
             Container(
               key: const Key('login-error'),
@@ -260,79 +237,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.white,
                     ),
                   )
-                : const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(child: Text('Sign In')),
-                      SizedBox(width: 8),
-                      Icon(Icons.login_rounded, size: 22),
-                    ],
-                  ),
+                : const Text('Login'),
+          ),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              key: const Key('login-forgot-password'),
+              onPressed: _busy ? null : _resetPassword,
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.darkGreen,
+                textStyle: linkStyle,
+              ),
+              child: const Text('Forgot password?'),
+            ),
           ),
         ],
       ),
     ),
   );
-}
-
-class _WelcomeCard extends StatelessWidget {
-  const _WelcomeCard({required this.greeting});
-
-  final String greeting;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return DashboardCard(
-      color: AppColors.attendanceCard,
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$greeting!',
-                  style: text.titleSmall?.copyWith(color: AppColors.accent),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Welcome back, Teacher!',
-                  style: text.headlineSmall?.copyWith(
-                    color: AppColors.darkGreen,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Sign in to take attendance, check your timetable and '
-                  'manage your classes.',
-                  style: text.bodyLarge,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x4400DA9B),
-                  blurRadius: 18,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.waving_hand_rounded,
-              size: 32,
-              color: AppColors.amber,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

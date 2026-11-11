@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sts_kehadiran/core/theme.dart';
 import 'package:sts_kehadiran/screens/login_screen.dart';
 import 'package:sts_kehadiran/screens/main_screen.dart';
 import 'package:sts_kehadiran/services/auth_service.dart';
-import 'package:sts_kehadiran/widgets/dashboard_widgets.dart';
 
 import 'fakes/fake_auth_service.dart';
 import 'helpers/test_app.dart';
@@ -15,6 +15,9 @@ import 'helpers/test_app.dart';
 final _email = find.byKey(const Key('login-email'));
 final _password = find.byKey(const Key('login-password'));
 final _submit = find.byKey(const Key('login-submit'));
+final _forgot = find.byKey(const Key('login-forgot-password'));
+final _signUp = find.byKey(const Key('login-sign-up'));
+final _footer = find.byKey(const Key('login-footer'));
 
 Future<void> _fillAndSubmit(
   WidgetTester tester, {
@@ -39,19 +42,76 @@ void main() {
     await font.load();
   });
 
-  testWidgets('Signed-out users see the welcome message and sign-in form', (
-    tester,
-  ) async {
+  testWidgets('Signed-out users see the login form', (tester) async {
     await pumpApp(tester, FakeAuthService());
     expect(find.byType(LoginScreen), findsOneWidget);
     expect(find.byType(MainScreen), findsNothing);
-    expect(find.text('STS Kehadiran'), findsOneWidget);
-    expect(find.text('Welcome back, Teacher!'), findsOneWidget);
-    expect(find.textContaining('Sign in to take attendance'), findsOneWidget);
+    expect(find.text('STS KEHADIRAN'), findsOneWidget);
     expect(find.text('Email'), findsOneWidget);
+    expect(find.text('Username'), findsNothing);
     expect(find.text('Password'), findsOneWidget);
-    expect(find.text('Sign In'), findsOneWidget);
+    expect(find.text('Login'), findsOneWidget);
     expect(find.text('Forgot password?'), findsOneWidget);
+    expect(find.text('Don’t have an account yet?'), findsOneWidget);
+    expect(find.text('Sign up'), findsOneWidget);
+  });
+
+  testWidgets('Title uses the theme display style', (tester) async {
+    await pumpApp(tester, FakeAuthService());
+    final title = tester.widget<Text>(find.byKey(const Key('login-title')));
+    final display = AppTheme.light().textTheme.displaySmall!;
+    expect(title.style?.fontSize, display.fontSize);
+    expect(title.style?.fontWeight, FontWeight.w800);
+    expect(title.textAlign, TextAlign.center);
+  });
+
+  testWidgets('Background is the theme login gradient', (tester) async {
+    await pumpApp(tester, FakeAuthService());
+    final box = tester.widget<DecoratedBox>(
+      find.byKey(const Key('login-background')),
+    );
+    expect((box.decoration as BoxDecoration).gradient, AppGradients.login);
+  });
+
+  for (final size in phoneSizes) {
+    testWidgets('Fields and button line up as equal rows at $size', (
+      tester,
+    ) async {
+      setScreen(tester, size);
+      await pumpApp(tester, FakeAuthService());
+      Rect field(Finder f) => tester.getRect(
+        find.descendant(of: f, matching: find.byType(InputDecorator)),
+      );
+      final email = field(_email);
+      final password = field(_password);
+      final button = tester.getRect(_submit);
+      for (final rect in [password, button]) {
+        expect(rect.left, moreOrLessEquals(email.left));
+        expect(rect.right, moreOrLessEquals(email.right));
+      }
+      for (final rect in [email, password, button]) {
+        expect(rect.height, moreOrLessEquals(AppSizes.controlHeight));
+      }
+      // Forgot password sits under the button, against its right edge.
+      final forgot = tester.getRect(_forgot);
+      expect(forgot.top, greaterThan(button.bottom));
+      expect(forgot.right, moreOrLessEquals(button.right));
+    });
+  }
+
+  testWidgets('Links meet the 48 dp tap target and 16 sp text size', (
+    tester,
+  ) async {
+    await pumpApp(tester, FakeAuthService());
+    for (final link in [_forgot, _signUp]) {
+      final size = tester.getSize(link);
+      expect(size.height, greaterThanOrEqualTo(48));
+      expect(size.width, greaterThanOrEqualTo(48));
+      final style = DefaultTextStyle.of(
+        tester.element(find.descendant(of: link, matching: find.byType(Text))),
+      ).style;
+      expect(style.fontSize, greaterThanOrEqualTo(16));
+    }
   });
 
   testWidgets('Signed-in users go straight to the dashboard', (tester) async {
@@ -59,27 +119,6 @@ void main() {
     expect(find.byType(MainScreen), findsOneWidget);
     expect(find.byType(LoginScreen), findsNothing);
   });
-
-  for (final entry in {
-    5: 'Good morning!',
-    13: 'Good afternoon!',
-    20: 'Good evening!',
-  }.entries) {
-    testWidgets('Greeting at ${entry.key}:00 is "${entry.value}"', (
-      tester,
-    ) async {
-      final service = FakeAuthService();
-      await tester.pumpWidget(
-        MaterialApp(
-          home: AuthScope(
-            service: service,
-            child: LoginScreen(now: () => DateTime(2026, 11, 11, entry.key)),
-          ),
-        ),
-      );
-      expect(find.text(entry.value), findsOneWidget);
-    });
-  }
 
   testWidgets('Empty fields show validation errors without signing in', (
     tester,
@@ -132,7 +171,7 @@ void main() {
     await _fillAndSubmit(tester);
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(find.text('Sign In'), findsNothing);
+    expect(find.text('Login'), findsNothing);
     await tester.tap(_submit, warnIfMissed: false);
     await tester.pump();
     expect(service.signInAttempts, 1);
@@ -231,14 +270,31 @@ void main() {
           const Offset(0, -3000),
         );
         await tester.pumpAndSettle();
-        expect(
-          find.byKey(const Key('login-footer')).hitTestable(),
-          findsOneWidget,
-        );
+        expect(_footer.hitTestable(), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     }
   }
+
+  testWidgets('Open keyboard does not overflow and the form scrolls', (
+    tester,
+  ) async {
+    setScreen(tester, const Size(360, 640));
+    tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+    addTearDown(tester.view.resetViewInsets);
+    await pumpApp(tester, FakeAuthService());
+    await tester.showKeyboard(_password);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    // Everything above the keyboard is still reachable by scrolling.
+    await tester.drag(
+      find.byKey(const Key('login-scroll')),
+      const Offset(0, -3000),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.getRect(_footer).bottom, lessThanOrEqualTo(640 - 300));
+    expect(_signUp.hitTestable(), findsOneWidget);
+  });
 
   testWidgets('On a tall phone the form is centred and the footer pinned', (
     tester,
@@ -255,34 +311,15 @@ void main() {
     );
     expect(scroll.position.maxScrollExtent, 0);
 
-    final headerBottom = tester
-        .getBottomLeft(
-          find.ancestor(
-            of: find.text('STS Kehadiran'),
-            matching: find.byType(Row),
-          ),
-        )
-        .dy;
-    final welcomeTop = tester
-        .getTopLeft(
-          find
-              .ancestor(
-                of: find.text('Welcome back, Teacher!'),
-                matching: find.byType(DashboardCard),
-              )
-              .first,
-        )
-        .dy;
-    final formBottom = tester
-        .getBottomLeft(find.byKey(const Key('login-form-card')))
-        .dy;
-    final footer = find.byKey(const Key('login-footer'));
-    // Equal space above and below the cards: vertically centred.
+    final titleTop = tester.getTopLeft(find.byKey(const Key('login-title'))).dy;
+    final formBottom = tester.getBottomLeft(_forgot).dy;
+    // Equal space above and below the form: vertically centred above the
+    // footer (the 16 dp top spacer and 24 dp form padding cancel out).
     expect(
-      welcomeTop - headerBottom,
-      moreOrLessEquals(tester.getTopLeft(footer).dy - formBottom),
+      titleTop - AppSpacing.section,
+      moreOrLessEquals(tester.getTopLeft(_footer).dy - formBottom),
     );
     // Footer sits at the bottom of the screen, above its 16 dp margin.
-    expect(tester.getBottomLeft(footer).dy, moreOrLessEquals(915 - 16));
+    expect(tester.getBottomLeft(_footer).dy, moreOrLessEquals(915 - 16));
   });
 }
