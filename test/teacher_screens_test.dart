@@ -147,7 +147,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  for (final action in ['View Reports', 'Manage Classes']) {
+  for (final action in ['View Reports', 'Contact Parents', 'Manage Classes']) {
     testWidgets('$action stays a placeholder', (tester) async {
       await pumpApp(tester, FakeAuthService.signedIn());
       await tester.scrollUntilVisible(

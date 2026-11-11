@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sts_kehadiran/core/theme.dart';
 import 'package:sts_kehadiran/screens/main_screen.dart';
+import 'package:sts_kehadiran/widgets/dashboard_widgets.dart';
 import 'package:sts_kehadiran/widgets/schedule_widgets.dart';
 
 import 'fakes/fake_auth_service.dart';
@@ -126,6 +127,46 @@ void main() {
             .where((row) => row.highlighted),
         isEmpty,
       );
+    });
+  });
+
+  group('Quick Actions', () {
+    const labels = ['View Reports', 'Contact Parents', 'Manage Classes'];
+
+    List<Rect> tileRects(WidgetTester tester) => [
+      for (final label in labels)
+        tester.getRect(
+          find.ancestor(
+            of: find.text(label),
+            matching: find.byType(QuickActionTile),
+          ),
+        ),
+    ];
+
+    testWidgets('are three large tiles side by side', (tester) async {
+      setScreen(tester, const Size(390, 844));
+      await tester.pumpWidget(_dashboardAt(_at(7)));
+      await _scrollToBottom(tester);
+      final rects = tileRects(tester);
+      for (final rect in rects) {
+        expect(rect.top, rects.first.top);
+        expect(rect.height, greaterThanOrEqualTo(112));
+        expect(rect.width, greaterThanOrEqualTo(48));
+      }
+      expect(find.text('Message Parents'), findsNothing);
+    });
+
+    testWidgets('stack as full-width rows with large text', (tester) async {
+      setScreen(tester, const Size(360, 640), textScale: 2);
+      await tester.pumpWidget(_dashboardAt(_at(7)));
+      await _scrollToBottom(tester);
+      final rects = tileRects(tester);
+      for (final (i, rect) in rects.indexed) {
+        expect(rect.width, rects.first.width);
+        expect(rect.height, greaterThanOrEqualTo(48));
+        if (i > 0) expect(rect.top, greaterThan(rects[i - 1].bottom));
+      }
+      expect(tester.takeException(), isNull);
     });
   });
 

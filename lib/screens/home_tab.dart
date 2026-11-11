@@ -202,25 +202,19 @@ class HomeTab extends StatelessWidget {
               children: [
                 Text('Quick Actions', style: text.titleMedium),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: DashboardAction(
-                        icon: Icons.description,
-                        label: 'View Reports',
-                        onTap: () =>
-                            showNotImplemented(context, 'View Reports'),
+                QuickActionsGrid(
+                  actions: [
+                    for (final (icon, label) in [
+                      (Icons.description, 'View Reports'),
+                      // Parent/guardian contact for absences (FR-02).
+                      (Icons.contact_phone_rounded, 'Contact Parents'),
+                      (Icons.groups, 'Manage Classes'),
+                    ])
+                      QuickAction(
+                        icon: icon,
+                        label: label,
+                        onTap: () => showNotImplemented(context, label),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: DashboardAction(
-                        icon: Icons.groups,
-                        label: 'Manage Classes',
-                        onTap: () =>
-                            showNotImplemented(context, 'Manage Classes'),
-                      ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
