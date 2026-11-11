@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 /// Body content for unfinished tabs; MainScreen owns the shared navigation.
 class FeaturePlaceholder extends StatelessWidget {
-  const FeaturePlaceholder({super.key, required this.title});
+  const FeaturePlaceholder({super.key, required this.title, this.action});
 
   final String title;
+
+  /// Optional widget shown below the message, e.g. a sign-out button.
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) => Align(
@@ -26,10 +29,19 @@ class FeaturePlaceholder extends StatelessWidget {
             ),
             Expanded(
               child: Center(
-                child: Text(
-                  '$title is under development.',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '$title is under development.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    if (action != null) ...[
+                      const SizedBox(height: 20),
+                      action!,
+                    ],
+                  ],
                 ),
               ),
             ),

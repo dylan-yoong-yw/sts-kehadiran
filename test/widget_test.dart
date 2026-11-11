@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sts_kehadiran/main.dart';
+
+import 'fakes/fake_auth_service.dart';
+import 'helpers/test_app.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +35,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       addTearDown(tester.view.resetPadding);
-      await tester.pumpWidget(const MyApp());
+      await pumpApp(tester, FakeAuthService.signedIn());
       final scroll = tester.state<ScrollableState>(
         find.byType(Scrollable).first,
       );
@@ -51,7 +53,7 @@ void main() {
   testWidgets('Main screen shows sample data and the current date', (
     tester,
   ) async {
-    await tester.pumpWidget(const MyApp());
+    await pumpApp(tester, FakeAuthService.signedIn());
     expect(find.text('STS Kehadiran'), findsOneWidget);
     expect(find.text('Hello, Mr. Leong'), findsOneWidget);
     final today = DateTime.now();
@@ -67,7 +69,7 @@ void main() {
     testWidgets('Selecting $className only shows a placeholder', (
       tester,
     ) async {
-      await tester.pumpWidget(const MyApp());
+      await pumpApp(tester, FakeAuthService.signedIn());
       await tester.tap(find.text('Take Attendance'));
       await tester.pumpAndSettle();
       expect(find.text('Select a class'), findsOneWidget);
@@ -94,7 +96,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      await tester.pumpWidget(const MyApp());
+      await pumpApp(tester, FakeAuthService.signedIn());
       final navBefore = tester.getCenter(find.text('Home'));
       await tester.drag(
         find.byKey(const Key('dashboard-scroll')),
@@ -122,7 +124,7 @@ void main() {
               .copyWith(textScaler: TextScaler.linear(1.5)),
           child: child!,
         ),
-        home: const MyApp(),
+        home: testApp(FakeAuthService.signedIn()),
       ),
     );
     await tester.drag(

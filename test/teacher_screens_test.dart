@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sts_kehadiran/main.dart';
+
+import 'fakes/fake_auth_service.dart';
+import 'helpers/test_app.dart';
+
 import 'package:sts_kehadiran/screens/attendance_screen.dart';
 import 'package:sts_kehadiran/screens/main_screen.dart';
 import 'package:sts_kehadiran/screens/profile_screen.dart';
@@ -56,7 +59,7 @@ void main() {
     testWidgets('${destination.key} shows its placeholder and returns Home', (
       tester,
     ) async {
-      await tester.pumpWidget(const MyApp());
+      await pumpApp(tester, FakeAuthService.signedIn());
       _expectNavigation(tester, 'Home');
       await tester.tap(find.byTooltip(destination.key));
       await tester.pumpAndSettle();
@@ -97,7 +100,10 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     final observer = _NavigationObserver();
     await tester.pumpWidget(
-      MaterialApp(navigatorObservers: [observer], home: const MainScreen()),
+      MaterialApp(
+        navigatorObservers: [observer],
+        home: const MainScreen(teacherName: 'Mr. Leong'),
+      ),
     );
     final initialPushes = observer.pushes;
     await tester.drag(
@@ -143,7 +149,7 @@ void main() {
 
   for (final action in ['View Reports', 'Manage Classes']) {
     testWidgets('$action stays a placeholder', (tester) async {
-      await tester.pumpWidget(const MyApp());
+      await pumpApp(tester, FakeAuthService.signedIn());
       await tester.scrollUntilVisible(
         find.text(action),
         200,

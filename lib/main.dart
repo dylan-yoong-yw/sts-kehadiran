@@ -2,16 +2,30 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
-import 'screens/main_screen.dart';
+import 'screens/auth_gate.dart';
+import 'services/auth_service.dart';
+import 'services/profile_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  runApp(
+    MyApp(
+      authService: FirebaseAuthService(),
+      profileService: FirestoreProfileService(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+    required this.authService,
+    required this.profileService,
+  });
+
+  final AuthService authService;
+  final ProfileService profileService;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -22,7 +36,7 @@ class MyApp extends StatelessWidget {
       scaffoldBackgroundColor: const Color(0xFFF7F9F8),
       useMaterial3: true,
     ),
-    home: const MainScreen(),
+    home: AuthGate(authService: authService, profileService: profileService),
   );
 }
 
