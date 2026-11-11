@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sts_kehadiran/screens/login_screen.dart';
 import 'package:sts_kehadiran/screens/main_screen.dart';
 import 'package:sts_kehadiran/services/auth_service.dart';
+import 'package:sts_kehadiran/widgets/dashboard_widgets.dart';
 
 import 'fakes/fake_auth_service.dart';
 import 'helpers/test_app.dart';
@@ -23,6 +24,7 @@ Future<void> _fillAndSubmit(
   await tester.enterText(_email, email);
   await tester.enterText(_password, password);
   await tester.ensureVisible(_submit);
+  await tester.pumpAndSettle();
   await tester.tap(_submit);
 }
 
@@ -213,54 +215,74 @@ void main() {
     expect(find.byType(MainScreen), findsNothing);
   });
 
-  for (final size in [
-    const Size(320, 568),
-    const Size(390, 844),
-    const Size(1280, 800),
-  ]) {
-    testWidgets('Login fits without overflow at $size', (tester) async {
-      tester.view.physicalSize = size;
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      await pumpApp(tester, FakeAuthService());
-      // Show an error too, the tallest state of the form.
-      await _fillAndSubmit(tester, password: 'wrong');
-      await tester.pumpAndSettle();
-      await tester.drag(
-        find.byKey(const Key('login-scroll')),
-        const Offset(0, -1000),
-      );
-      await tester.pumpAndSettle();
-      expect(
-        find.textContaining('For registered teachers only'),
-        findsOneWidget,
-      );
-      expect(tester.takeException(), isNull);
-    });
+  for (final size in phoneSizes) {
+    for (final scale in textScales) {
+      testWidgets('Login has no overflow at $size, text x$scale', (
+        tester,
+      ) async {
+        setScreen(tester, size, textScale: scale);
+        await pumpApp(tester, FakeAuthService());
+        // Show an error too, the tallest state of the form.
+        await _fillAndSubmit(tester, password: 'wrong');
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('login-error')), findsOneWidget);
+        await tester.drag(
+          find.byKey(const Key('login-scroll')),
+          const Offset(0, -3000),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('login-footer')).hitTestable(),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      });
+    }
   }
 
-  testWidgets('Login handles large text on a narrow phone', (tester) async {
-    tester.view.physicalSize = const Size(320, 640);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(
-      MaterialApp(
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context)
-              .copyWith(textScaler: const TextScaler.linear(1.5)),
-          child: child!,
-        ),
-        home: testApp(FakeAuthService()),
-      ),
+  testWidgets('On a tall phone the form is centred and the footer pinned', (
+    tester,
+  ) async {
+    setScreen(tester, const Size(412, 915));
+    await pumpApp(tester, FakeAuthService());
+    final scroll = tester.state<ScrollableState>(
+      find
+          .descendant(
+            of: find.byKey(const Key('login-scroll')),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
-    expect(find.text('Welcome back, Teacher!'), findsOneWidget);
-    await tester.drag(
-      find.byKey(const Key('login-scroll')),
-      const Offset(0, -1500),
+    expect(scroll.position.maxScrollExtent, 0);
+
+    final headerBottom = tester
+        .getBottomLeft(
+          find.ancestor(
+            of: find.text('STS Kehadiran'),
+            matching: find.byType(Row),
+          ),
+        )
+        .dy;
+    final welcomeTop = tester
+        .getTopLeft(
+          find
+              .ancestor(
+                of: find.text('Welcome back, Teacher!'),
+                matching: find.byType(DashboardCard),
+              )
+              .first,
+        )
+        .dy;
+    final formBottom = tester
+        .getBottomLeft(find.byKey(const Key('login-form-card')))
+        .dy;
+    final footer = find.byKey(const Key('login-footer'));
+    // Equal space above and below the cards: vertically centred.
+    expect(
+      welcomeTop - headerBottom,
+      moreOrLessEquals(tester.getTopLeft(footer).dy - formBottom),
     );
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
+    // Footer sits at the bottom of the screen, above its 16 dp margin.
+    expect(tester.getBottomLeft(footer).dy, moreOrLessEquals(915 - 16));
   });
 }
