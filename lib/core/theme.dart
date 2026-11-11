@@ -36,6 +36,24 @@ abstract final class AppColors {
   // Shadows.
   static const shadow = Color(0x300D483A);
   static const buttonShadow = Color(0x5500A67D);
+
+  /// Light tint of [green] at the bottom of the login background.
+  static final loginGreen = Color.lerp(Colors.white, green, 0.55)!;
+}
+
+abstract final class AppGradients {
+  /// Login background: white at the top fading to [AppColors.loginGreen].
+  static final login = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Colors.white, AppColors.loginGreen],
+  );
+}
+
+/// Fixed component sizes in logical pixels (dp).
+abstract final class AppSizes {
+  /// Height of text fields and the primary button, so they line up.
+  static const controlHeight = 56.0;
 }
 
 /// Spacing in logical pixels (dp).
@@ -54,6 +72,13 @@ abstract final class AppTheme {
   /// Text sizes in sp. Screens use these through [ThemeData.textTheme]
   /// instead of hard-coded font sizes.
   static const textTheme = TextTheme(
+    // Login title, "STS KEHADIRAN".
+    displaySmall: TextStyle(
+      fontSize: 30,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 0.5,
+      height: 1.2,
+    ),
     // Greeting, e.g. "Hello, Mr. Dylan" and "Welcome back, Teacher!".
     headlineSmall: TextStyle(
       fontSize: 24,
@@ -89,11 +114,45 @@ abstract final class AppTheme {
     foregroundColor: Colors.white,
     disabledBackgroundColor: const Color(0xFF7FDFC2),
     disabledForegroundColor: Colors.white,
-    minimumSize: const Size.fromHeight(56),
+    minimumSize: const Size.fromHeight(AppSizes.controlHeight),
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
     elevation: 1,
     shadowColor: AppColors.buttonShadow,
   );
+
+  static OutlineInputBorder _border(
+    Color color, {
+    double width = 1,
+    required double radius,
+  }) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(radius),
+    borderSide: BorderSide(color: color, width: width),
+  );
+
+  /// [theme] with the login screen's fields: white fill, dark border and
+  /// [AppSizes.controlHeight] tall at the default text size, so they line
+  /// up with the primary button.
+  static ThemeData loginFields(ThemeData theme) {
+    final inputText = theme.textTheme.bodyLarge!;
+    final lineHeight = inputText.fontSize! * (inputText.height ?? 1);
+    final verticalPadding = (AppSizes.controlHeight - lineHeight) / 2;
+    OutlineInputBorder border(Color color, [double width = 1.5]) =>
+        _border(color, width: width, radius: 12);
+    return theme.copyWith(
+      inputDecorationTheme: theme.inputDecorationTheme.copyWith(
+        fillColor: Colors.white,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: verticalPadding,
+        ),
+        enabledBorder: border(AppColors.darkGreen),
+        focusedBorder: border(AppColors.green, 2),
+        errorBorder: border(AppColors.error),
+        focusedErrorBorder: border(AppColors.error, 2),
+        disabledBorder: border(AppColors.muted),
+      ),
+    );
+  }
 
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(seedColor: AppColors.seed);
@@ -102,10 +161,7 @@ abstract final class AppTheme {
     // so every style below renders in the app's font.
     final text = base.textTheme.merge(textTheme);
     OutlineInputBorder border(Color color, [double width = 1]) =>
-        OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: color, width: width),
-        );
+        _border(color, width: width, radius: 16);
     const minTap = Size(48, 48);
 
     return base.copyWith(
