@@ -1,0 +1,14 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Teacher profiles: each signed-in teacher can read only their own.
+    // Profiles are created and edited in the Firebase console for now.
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Everything else stays locked until it is needed.
+  }
+}

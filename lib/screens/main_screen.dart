@@ -11,7 +11,10 @@ const _darkGreen = Color(0xFF064C3D);
 const _background = Color(0xFFF2FFFA);
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({super.key, this.teacherName = 'Teacher'});
+
+  /// How the signed-in teacher is addressed, e.g. "Mr. Dylan".
+  final String teacherName;
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -176,8 +179,8 @@ class _MainScreenState extends State<MainScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Hello, Mr. Leong',
+                                    Text(
+                                      'Hello, ${widget.teacherName}',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w800,
@@ -360,25 +363,26 @@ class _MainScreenState extends State<MainScreen> {
                               color: const Color(0xFFD7EFF7),
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.auto_stories,
                                   size: 26,
                                   color: Color(0xFF4E9AAB),
                                 ),
-                                SizedBox(width: 10),
+                                const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
-                                    'Have a great day of teaching, Mr. Leong!',
-                                    style: TextStyle(
+                                    'Have a great day of teaching, '
+                                    '${widget.teacherName}!',
+                                    style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 6),
-                                Icon(
+                                const SizedBox(width: 6),
+                                const Icon(
                                   Icons.edit,
                                   size: 22,
                                   color: Color(0xFFDCAB4D),
