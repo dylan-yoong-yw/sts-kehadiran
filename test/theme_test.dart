@@ -58,10 +58,20 @@ void main() {
   });
 
   test('login fields are white with a dark border', () {
-    final fields = AppTheme.loginFields(theme).inputDecorationTheme;
+    final login = AppTheme.loginForm(theme);
+    final fields = login.inputDecorationTheme;
     expect(fields.fillColor, Colors.white);
     final border = fields.enabledBorder! as OutlineInputBorder;
     expect(border.borderSide.color, AppColors.darkGreen);
+    // The button has the same corners as the fields.
+    final buttonShape = login.filledButtonTheme.style?.shape?.resolve(
+      {},
+    ) as RoundedRectangleBorder?;
+    expect(buttonShape?.borderRadius, border.borderRadius);
+    expect(
+      login.filledButtonTheme.style?.minimumSize?.resolve({})?.height,
+      greaterThanOrEqualTo(48),
+    );
     // The rest of the app keeps its own field style.
     expect(theme.inputDecorationTheme.fillColor, AppColors.background);
   });

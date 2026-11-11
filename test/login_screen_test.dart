@@ -66,6 +66,20 @@ void main() {
     expect(title.textAlign, TextAlign.center);
   });
 
+  testWidgets('Title stays on one line on a narrow phone with x2 text', (
+    tester,
+  ) async {
+    setScreen(tester, const Size(360, 640), textScale: 2);
+    await pumpApp(tester, FakeAuthService());
+    final title = tester.getRect(find.byKey(const Key('login-title')));
+    final display = AppTheme.light().textTheme.displaySmall!;
+    // One line at most x2 text: wrapping would make it 2-3 lines tall.
+    final oneLine = display.fontSize! * display.height! * 2;
+    expect(title.height, lessThanOrEqualTo(oneLine + 1));
+    expect(title.width, lessThanOrEqualTo(360));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Background is the theme login gradient', (tester) async {
     await pumpApp(tester, FakeAuthService());
     final box = tester.widget<DecoratedBox>(

@@ -129,13 +129,26 @@ abstract final class AppTheme {
     borderSide: BorderSide(color: color, width: width),
   );
 
-  /// [theme] with the login screen's fields: white fill, dark border and
-  /// at least [AppSizes.controlHeight] tall, so they line up with the
-  /// primary button. Larger system text makes them taller.
-  static ThemeData loginFields(ThemeData theme) {
+  /// Corner radius shared by the login fields and button.
+  static const loginRadius = 12.0;
+
+  /// [theme] for the login form: white fields with a dark border, at least
+  /// [AppSizes.controlHeight] tall, and buttons with the same corners, so
+  /// the fields and the primary button read as matching rows. Larger
+  /// system text makes the fields taller.
+  static ThemeData loginForm(ThemeData theme) {
     OutlineInputBorder border(Color color, [double width = 1.5]) =>
-        _border(color, width: width, radius: 12);
+        _border(color, width: width, radius: loginRadius);
     return theme.copyWith(
+      filledButtonTheme: FilledButtonThemeData(
+        style: theme.filledButtonTheme.style?.copyWith(
+          shape: const WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(loginRadius)),
+            ),
+          ),
+        ),
+      ),
       inputDecorationTheme: theme.inputDecorationTheme.copyWith(
         fillColor: Colors.white,
         constraints: const BoxConstraints(minHeight: AppSizes.controlHeight),

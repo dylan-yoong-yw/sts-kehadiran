@@ -112,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 24),
                     child: Theme(
-                      data: AppTheme.loginFields(theme),
+                      data: AppTheme.loginForm(theme),
                       child: _buildForm(text, linkStyle),
                     ),
                   ),
@@ -154,11 +154,17 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'STS KEHADIRAN',
-            key: const Key('login-title'),
-            textAlign: TextAlign.center,
-            style: text.displaySmall?.copyWith(color: AppColors.darkGreen),
+          // Shrinks only when the title would not fit on one line (narrow
+          // phones with very large system text).
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              'STS KEHADIRAN',
+              key: const Key('login-title'),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              style: text.displaySmall?.copyWith(color: AppColors.darkGreen),
+            ),
           ),
           const SizedBox(height: 32),
           TextFormField(
