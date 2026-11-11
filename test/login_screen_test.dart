@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sts_kehadiran/core/theme.dart';
 import 'package:sts_kehadiran/screens/login_screen.dart';
 import 'package:sts_kehadiran/screens/main_screen.dart';
+import 'package:sts_kehadiran/screens/sign_up_screen.dart';
 import 'package:sts_kehadiran/services/auth_service.dart';
 
 import 'fakes/fake_auth_service.dart';
@@ -193,6 +194,22 @@ void main() {
     await tester.tap(find.byTooltip('Hide password'));
     await tester.pump();
     expect(field().obscureText, isTrue);
+  });
+
+  testWidgets('Sign up opens the registration placeholder and back returns', (
+    tester,
+  ) async {
+    await pumpApp(tester, FakeAuthService());
+    await tester.ensureVisible(_signUp);
+    await tester.tap(_signUp);
+    await tester.pumpAndSettle();
+    expect(find.byType(SignUpScreen), findsOneWidget);
+    expect(find.text('Sign up is under development.'), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.byType(SignUpScreen), findsNothing);
+    expect(find.byType(LoginScreen), findsOneWidget);
   });
 
   group('Forgot password', () {

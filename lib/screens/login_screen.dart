@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/theme.dart';
 import '../services/auth_service.dart';
 import '../widgets/fill_scroll_view.dart';
+import 'sign_up_screen.dart';
 
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
@@ -83,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _openSignUp() {}
+  void _openSignUp() => Navigator.of(context).push(SignUpScreen.route());
 
   @override
   Widget build(BuildContext context) {
