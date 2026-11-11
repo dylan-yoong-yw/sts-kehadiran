@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'fakes/fake_auth_service.dart';
 import 'helpers/test_app.dart';
 
+import 'package:sts_kehadiran/core/theme.dart';
 import 'package:sts_kehadiran/screens/attendance_screen.dart';
 import 'package:sts_kehadiran/screens/main_screen.dart';
 import 'package:sts_kehadiran/screens/profile_screen.dart';
@@ -18,6 +19,10 @@ void _expectNavigation(WidgetTester tester, String selectedTab) {
   final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
   expect(scaffold.bottomNavigationBar, isNotNull);
   final navigation = find.byWidget(scaffold.bottomNavigationBar!);
+  final bar = tester.widget<NavigationBar>(
+    find.descendant(of: navigation, matching: find.byType(NavigationBar)),
+  );
+  expect(bar.selectedIndex, _tabs.indexOf(selectedTab));
   for (final tab in _tabs) {
     expect(
       find.descendant(of: navigation, matching: find.text(tab)).hitTestable(),
@@ -25,17 +30,16 @@ void _expectNavigation(WidgetTester tester, String selectedTab) {
     );
     final item = find.byTooltip(tab);
     expect(item, findsOneWidget);
-    final semantics = tester.widget<Semantics>(
-      find.ancestor(of: item, matching: find.byType(Semantics)).first,
-    );
-    expect(semantics.properties.selected, tab == selectedTab);
-    final icon = tester.widget<Icon>(
-      find.descendant(of: item, matching: find.byType(Icon)),
-    );
+    // Icon colours come from the navigation bar theme.
+    final icon = find.descendant(of: item, matching: find.byType(Icon));
     expect(
-      icon.color,
+      IconTheme.of(tester.element(icon)).color,
       tab == selectedTab ? const Color(0xFF008D67) : const Color(0xFF9BA6B5),
     );
+    // Large enough to tap comfortably.
+    final size = tester.getSize(item);
+    expect(size.width, greaterThanOrEqualTo(48));
+    expect(size.height, greaterThanOrEqualTo(48));
   }
 }
 
@@ -101,6 +105,7 @@ void main() {
     final observer = _NavigationObserver();
     await tester.pumpWidget(
       MaterialApp(
+        theme: AppTheme.light(),
         navigatorObservers: [observer],
         home: const MainScreen(teacherName: 'Mr. Leong'),
       ),
@@ -147,7 +152,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  for (final action in ['View Reports', 'Manage Classes']) {
+  for (final action in ['View Reports', 'Contact Parents', 'Manage Classes']) {
     testWidgets('$action stays a placeholder', (tester) async {
       await pumpApp(tester, FakeAuthService.signedIn());
       await tester.scrollUntilVisible(

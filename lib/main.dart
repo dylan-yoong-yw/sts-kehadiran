@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'core/theme.dart';
 import 'firebase_options.dart';
 import 'screens/auth_gate.dart';
 import 'services/auth_service.dart';
@@ -31,11 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
     title: 'STS Kehadiran',
     debugShowCheckedModeBanner: false,
-    theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF27665B)),
-      scaffoldBackgroundColor: const Color(0xFFF7F9F8),
-      useMaterial3: true,
-    ),
+    theme: AppTheme.light(),
     home: AuthGate(authService: authService, profileService: profileService),
   );
 }

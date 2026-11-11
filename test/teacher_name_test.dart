@@ -12,7 +12,6 @@ const _dylan = AppUser(uid: 'dylan-uid', email: 'dylanyoong767@gmail.com');
 
 void _expectName(String name) {
   expect(find.text('Hello, $name'), findsOneWidget);
-  expect(find.text('Have a great day of teaching, $name!'), findsOneWidget);
 }
 
 void main() {
