@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/theme.dart';
 import '../services/auth_service.dart';
 import '../widgets/dashboard_widgets.dart';
+import '../widgets/fill_scroll_view.dart';
 
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
@@ -101,63 +102,56 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
-            // Fills at least the screen height so the form can be centred
-            // and the footer pinned to the bottom; scrolls when the content
-            // is taller (short phones, large system text, open keyboard).
-            child: CustomScrollView(
-              key: const Key('login-scroll'),
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.screen,
-                  ),
-                  sliver: SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: AppSpacing.section),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.school,
-                              size: 28,
-                              color: AppColors.darkGreen,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'STS Kehadiran',
-                                style: text.titleLarge?.copyWith(
-                                  color: AppColors.darkGreen,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        const SizedBox(height: 24),
-                        _WelcomeCard(greeting: _greeting),
-                        const SizedBox(height: AppSpacing.section),
-                        DashboardCard(
-                          key: const Key('login-form-card'),
-                          color: Colors.white,
-                          child: _buildForm(text),
-                        ),
-                        const SizedBox(height: 24),
-                        const Spacer(),
-                        Text(
-                          'For registered teachers only. Contact your school '
-                          'admin if you need an account.',
-                          key: const Key('login-footer'),
-                          textAlign: TextAlign.center,
-                          style: text.bodySmall?.copyWith(
-                            color: AppColors.muted,
+            // Header at the top, footer at the bottom and the cards centred
+            // between them; scrolls when the content is taller (short
+            // phones, large system text, open keyboard).
+            child: FillScrollView(
+              scrollKey: const Key('login-scroll'),
+              sections: [
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.section),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.school,
+                        size: 28,
+                        color: AppColors.darkGreen,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'STS Kehadiran',
+                          style: text.titleLarge?.copyWith(
+                            color: AppColors.darkGreen,
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.section),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _WelcomeCard(greeting: _greeting),
+                      const SizedBox(height: AppSpacing.section),
+                      DashboardCard(
+                        key: const Key('login-form-card'),
+                        color: Colors.white,
+                        child: _buildForm(text),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.section),
+                  child: Text(
+                    'For registered teachers only. Contact your school admin '
+                    'if you need an account.',
+                    key: const Key('login-footer'),
+                    textAlign: TextAlign.center,
+                    style: text.bodySmall?.copyWith(color: AppColors.muted),
                   ),
                 ),
               ],
