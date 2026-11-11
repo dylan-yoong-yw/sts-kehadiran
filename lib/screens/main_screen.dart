@@ -1,13 +1,26 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/dashboard_widgets.dart';
+import 'attendance_screen.dart';
+import 'profile_screen.dart';
+import 'students_screen.dart';
+import 'timetable_screen.dart';
 
 const _green = Color(0xFF00C58B);
 const _darkGreen = Color(0xFF064C3D);
 const _background = Color(0xFFF2FFFA);
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedTab = 0;
+
+  void _selectTab(int index) => setState(() => _selectedTab = index);
 
   static const _days = [
     'Monday',
@@ -99,290 +112,302 @@ class MainScreen extends StatelessWidget {
       backgroundColor: _background,
       body: SafeArea(
         bottom: false,
-        child: LayoutBuilder(
-          builder: (context, viewport) {
-            // Tighten spacing on phones, without shrinking the whole screen or
-            // disabling the user's text-size settings.
-            final compact = viewport.maxHeight < 680;
-            final shortPhone = viewport.maxHeight < 560;
-            final gap = shortPhone
-                ? 4.0
-                : compact
-                ? 8.0
-                : 12.0;
-            final cardPadding = EdgeInsets.all(
-              shortPhone
-                  ? 6
-                  : compact
-                  ? 10
-                  : 14,
-            );
-            final cardTitle = TextStyle(
-              fontSize: shortPhone ? 17 : 19,
-              fontWeight: FontWeight.w800,
-            );
-            return Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                // Keep every section reachable on short windows and with
-                // enlarged text; navigation stays outside the scroll view.
-                child: SingleChildScrollView(
-                  key: const Key('dashboard-scroll'),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: shortPhone ? 6 : 10,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.school, size: 25, color: _darkGreen),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'STS Kehadiran',
-                              style: TextStyle(
-                                color: _darkGreen,
-                                fontSize: shortPhone ? 21 : 23,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                          ),
-                        ],
+        child: IndexedStack(
+          index: _selectedTab,
+          children: [
+            LayoutBuilder(
+              builder: (context, viewport) {
+                // Tighten spacing on phones, without shrinking the whole screen or
+                // disabling the user's text-size settings.
+                final compact = viewport.maxHeight < 680;
+                final shortPhone = viewport.maxHeight < 560;
+                final gap = shortPhone
+                    ? 4.0
+                    : compact
+                    ? 8.0
+                    : 12.0;
+                final cardPadding = EdgeInsets.all(
+                  shortPhone
+                      ? 6
+                      : compact
+                      ? 10
+                      : 14,
+                );
+                final cardTitle = TextStyle(
+                  fontSize: shortPhone ? 17 : 19,
+                  fontWeight: FontWeight.w800,
+                );
+                return Align(
+                  alignment: Alignment.topCenter,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 520),
+                    // Keep every section reachable on short windows and with
+                    // enlarged text; navigation stays outside the scroll view.
+                    child: SingleChildScrollView(
+                      key: const Key('dashboard-scroll'),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: shortPhone ? 6 : 10,
                       ),
-                      SizedBox(height: gap),
-                      Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Hello, Mr. Leong',
+                          Row(
+                            children: [
+                              Icon(Icons.school, size: 25, color: _darkGreen),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'STS Kehadiran',
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    color: _darkGreen,
+                                    fontSize: shortPhone ? 21 : 23,
                                     fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.5,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '$weekday, $dayMonth ${now.year}',
-                                  style: const TextStyle(fontSize: 11),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 7,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE2ECE8),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              children: [
-                                const Icon(
-                                  Icons.calendar_month_outlined,
-                                  color: Color(0xFF6A7973),
-                                  size: 19,
-                                ),
-                                Text(
-                                  '${now.day} ${_months[now.month - 1].substring(0, 3)}',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Color(0xFF53625D),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: gap),
-                      DashboardCard(
-                        color: const Color(0xFFCFF2E7),
-                        padding: cardPadding,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Today’s Attendance', style: cardTitle),
-                            const SizedBox(height: 8),
-                            const Wrap(
-                              spacing: 18,
-                              runSpacing: 4,
-                              children: [
-                                Text(
-                                  '• 3 Bestari',
-                                  style: TextStyle(fontSize: 13),
-                                ),
-                                Text(
-                                  '• 4 Cemerlang',
-                                  style: TextStyle(fontSize: 13),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: shortPhone ? 6 : 10),
-                            SizedBox(
-                              width: double.infinity,
-                              child: FilledButton(
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: _green,
-                                  foregroundColor: Colors.white,
-                                  minimumSize: const Size.fromHeight(48),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 10,
-                                  ),
-                                  elevation: 2,
-                                  shadowColor: const Color(0x5500A67D),
-                                ),
-                                onPressed: () => _selectClass(context),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                          SizedBox(height: gap),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Flexible(
-                                      child: Text(
-                                        'Take Attendance',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                    const Text(
+                                      'Hello, Mr. Leong',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
                                       ),
                                     ),
-                                    SizedBox(width: 8),
-                                    Icon(Icons.north_east, size: 19),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '$weekday, $dayMonth ${now.year}',
+                                      style: const TextStyle(fontSize: 11),
+                                    ),
                                   ],
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: gap),
-                      DashboardCard(
-                        color: const Color(0xFFE3F2F9),
-                        padding: cardPadding,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Today’s Schedule', style: cardTitle),
-                            SizedBox(height: 8),
-                            _LessonRow(
-                              subject: 'Mathematics',
-                              className: '4 Cemerlang',
-                              time: '8:00–9:00',
-                            ),
-                            Divider(
-                              color: Color(0xFFCADDE4),
-                              height: shortPhone ? 6 : 10,
-                            ),
-                            _LessonRow(
-                              subject: 'Physics',
-                              className: '5 Bijak',
-                              time: '9:30–10:30',
-                            ),
-                            Divider(
-                              color: Color(0xFFCADDE4),
-                              height: shortPhone ? 6 : 10,
-                            ),
-                            _LessonRow(
-                              subject: 'Add. Maths',
-                              className: '3 Bestari',
-                              time: '11:30–12:30',
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: gap),
-                      const Text(
-                        'Quick Actions',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DashboardAction(
-                              icon: Icons.description,
-                              label: 'View Reports',
-                              onTap: () =>
-                                  _notImplemented(context, 'View Reports'),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 7,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE2ECE8),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  children: [
+                                    const Icon(
+                                      Icons.calendar_month_outlined,
+                                      color: Color(0xFF6A7973),
+                                      size: 19,
+                                    ),
+                                    Text(
+                                      '${now.day} ${_months[now.month - 1].substring(0, 3)}',
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        color: Color(0xFF53625D),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: gap),
+                          DashboardCard(
+                            color: const Color(0xFFCFF2E7),
+                            padding: cardPadding,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Today’s Attendance', style: cardTitle),
+                                const SizedBox(height: 8),
+                                const Wrap(
+                                  spacing: 18,
+                                  runSpacing: 4,
+                                  children: [
+                                    Text(
+                                      '• 3 Bestari',
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                    Text(
+                                      '• 4 Cemerlang',
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: shortPhone ? 6 : 10),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: _green,
+                                      foregroundColor: Colors.white,
+                                      minimumSize: const Size.fromHeight(48),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 10,
+                                      ),
+                                      elevation: 2,
+                                      shadowColor: const Color(0x5500A67D),
+                                    ),
+                                    onPressed: () => _selectClass(context),
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            'Take Attendance',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Icon(Icons.north_east, size: 19),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: DashboardAction(
-                              icon: Icons.groups,
-                              label: 'Manage Classes',
-                              onTap: () =>
-                                  _notImplemented(context, 'Manage Classes'),
+                          SizedBox(height: gap),
+                          DashboardCard(
+                            color: const Color(0xFFE3F2F9),
+                            padding: cardPadding,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Today’s Schedule', style: cardTitle),
+                                SizedBox(height: 8),
+                                _LessonRow(
+                                  subject: 'Mathematics',
+                                  className: '4 Cemerlang',
+                                  time: '8:00–9:00',
+                                ),
+                                Divider(
+                                  color: Color(0xFFCADDE4),
+                                  height: shortPhone ? 6 : 10,
+                                ),
+                                _LessonRow(
+                                  subject: 'Physics',
+                                  className: '5 Bijak',
+                                  time: '9:30–10:30',
+                                ),
+                                Divider(
+                                  color: Color(0xFFCADDE4),
+                                  height: shortPhone ? 6 : 10,
+                                ),
+                                _LessonRow(
+                                  subject: 'Add. Maths',
+                                  className: '3 Bestari',
+                                  time: '11:30–12:30',
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: gap),
+                          const Text(
+                            'Quick Actions',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: DashboardAction(
+                                  icon: Icons.description,
+                                  label: 'View Reports',
+                                  onTap: () =>
+                                      _notImplemented(context, 'View Reports'),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: DashboardAction(
+                                  icon: Icons.groups,
+                                  label: 'Manage Classes',
+                                  onTap: () => _notImplemented(
+                                    context,
+                                    'Manage Classes',
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: gap),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: shortPhone ? 6 : 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFD7EFF7),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.auto_stories,
+                                  size: 26,
+                                  color: Color(0xFF4E9AAB),
+                                ),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    'Have a great day of teaching, Mr. Leong!',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 6),
+                                Icon(
+                                  Icons.edit,
+                                  size: 22,
+                                  color: Color(0xFFDCAB4D),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Center(
+                            child: Text(
+                              'Sample classes and lessons',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFF63796F),
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: gap),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: shortPhone ? 6 : 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD7EFF7),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(
-                              Icons.auto_stories,
-                              size: 26,
-                              color: Color(0xFF4E9AAB),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                'Have a great day of teaching, Mr. Leong!',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 6),
-                            Icon(
-                              Icons.edit,
-                              size: 22,
-                              color: Color(0xFFDCAB4D),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      const Center(
-                        child: Text(
-                          'Sample classes and lessons',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF63796F),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            );
-          },
+                );
+              },
+            ),
+            const AttendanceScreen(),
+            const StudentsScreen(),
+            const TimetableScreen(),
+            const ProfileScreen(),
+          ],
         ),
       ),
       bottomNavigationBar: Container(
@@ -406,28 +431,32 @@ class MainScreen extends StatelessWidget {
                 _NavigationItem(
                   icon: Icons.home_rounded,
                   label: 'Home',
-                  selected: true,
-                  onTap: () {},
+                  selected: _selectedTab == 0,
+                  onTap: () => _selectTab(0),
                 ),
                 _NavigationItem(
                   icon: Icons.checklist_rounded,
                   label: 'Attendance',
-                  onTap: () => _notImplemented(context, 'Attendance'),
+                  selected: _selectedTab == 1,
+                  onTap: () => _selectTab(1),
                 ),
                 _NavigationItem(
                   icon: Icons.groups_rounded,
                   label: 'Students',
-                  onTap: () => _notImplemented(context, 'Students'),
+                  selected: _selectedTab == 2,
+                  onTap: () => _selectTab(2),
                 ),
                 _NavigationItem(
                   icon: Icons.calendar_month_rounded,
                   label: 'Timetable',
-                  onTap: () => _notImplemented(context, 'Timetable'),
+                  selected: _selectedTab == 3,
+                  onTap: () => _selectTab(3),
                 ),
                 _NavigationItem(
                   icon: Icons.account_circle_rounded,
                   label: 'Profile',
-                  onTap: () => _notImplemented(context, 'Profile'),
+                  selected: _selectedTab == 4,
+                  onTap: () => _selectTab(4),
                 ),
               ],
             ),

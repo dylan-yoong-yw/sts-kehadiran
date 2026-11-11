@@ -1,4 +1,4 @@
-package com.example.sts_kehadiran
+package my.edu.unimas.stskehadiran
 
 import io.flutter.embedding.android.FlutterActivity
 
