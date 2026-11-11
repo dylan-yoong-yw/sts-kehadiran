@@ -208,6 +208,11 @@ void main() {
         );
         // The navigation bar stays put while the content scrolls.
         expect(tester.getCenter(find.text('Home')), navBefore);
+        // Every navigation label stays on one line (none wraps).
+        final lineHeight = tester.getSize(find.text('Home')).height;
+        for (final label in ['Attendance', 'Students', 'Timetable']) {
+          expect(tester.getSize(find.text(label)).height, lineHeight);
+        }
         expect(tester.takeException(), isNull);
       });
     }

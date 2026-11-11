@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/app_navigation_bar.dart';
 import 'attendance_screen.dart';
 import 'home_tab.dart';
 import 'profile_screen.dart';
@@ -45,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       // Material 3 navigation bar; colours, indicator and the always-visible
       // labels come from AppTheme.
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: AppNavigationBar(
         selectedIndex: _selectedTab,
         onDestinationSelected: _selectTab,
         destinations: const [

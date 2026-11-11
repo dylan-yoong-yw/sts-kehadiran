@@ -91,7 +91,6 @@ abstract final class AppTheme {
     disabledForegroundColor: Colors.white,
     minimumSize: const Size.fromHeight(56),
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-    textStyle: textTheme.labelLarge,
     elevation: 1,
     shadowColor: AppColors.buttonShadow,
   );
@@ -99,6 +98,9 @@ abstract final class AppTheme {
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(seedColor: AppColors.seed);
     final base = ThemeData(colorScheme: scheme, useMaterial3: true);
+    // Sizes from [textTheme] on top of the platform font (family, colour),
+    // so every style below renders in the app's font.
+    final text = base.textTheme.merge(textTheme);
     OutlineInputBorder border(Color color, [double width = 1]) =>
         OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -108,7 +110,7 @@ abstract final class AppTheme {
 
     return base.copyWith(
       scaffoldBackgroundColor: AppColors.background,
-      textTheme: base.textTheme.merge(textTheme),
+      textTheme: text,
       iconTheme: const IconThemeData(size: 24),
       materialTapTargetSize: MaterialTapTargetSize.padded,
       cardTheme: const CardThemeData(
@@ -124,19 +126,19 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: minTap,
-          textStyle: textTheme.labelLarge,
+          textStyle: text.labelLarge,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: minTap,
-          textStyle: textTheme.labelLarge,
+          textStyle: text.labelLarge,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           minimumSize: minTap,
-          textStyle: textTheme.labelLarge,
+          textStyle: text.labelLarge,
         ),
       ),
       iconButtonTheme: IconButtonThemeData(
@@ -149,14 +151,14 @@ abstract final class AppTheme {
           horizontal: 16,
           vertical: 18,
         ),
-        labelStyle: textTheme.bodyLarge,
+        labelStyle: text.bodyLarge,
         prefixIconColor: AppColors.accent,
         enabledBorder: border(AppColors.fieldBorder),
         focusedBorder: border(AppColors.green, 2),
         errorBorder: border(AppColors.error),
         focusedErrorBorder: border(AppColors.error, 2),
         disabledBorder: border(AppColors.dateChip),
-        errorStyle: textTheme.bodySmall?.copyWith(color: AppColors.error),
+        errorStyle: text.bodySmall?.copyWith(color: AppColors.error),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: Colors.white,
@@ -176,16 +178,16 @@ abstract final class AppTheme {
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? textTheme.labelSmall!.copyWith(
+              ? text.labelSmall!.copyWith(
                   color: AppColors.darkGreen,
                   fontWeight: FontWeight.w800,
                 )
-              : textTheme.labelSmall!.copyWith(color: AppColors.navLabel),
+              : text.labelSmall!.copyWith(color: AppColors.navLabel),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        contentTextStyle: textTheme.bodyLarge?.copyWith(color: Colors.white),
+        contentTextStyle: text.bodyLarge?.copyWith(color: Colors.white),
       ),
       dividerTheme: const DividerThemeData(
         color: AppColors.scheduleDivider,

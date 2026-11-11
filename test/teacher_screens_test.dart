@@ -19,7 +19,9 @@ void _expectNavigation(WidgetTester tester, String selectedTab) {
   final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
   expect(scaffold.bottomNavigationBar, isNotNull);
   final navigation = find.byWidget(scaffold.bottomNavigationBar!);
-  final bar = tester.widget<NavigationBar>(navigation);
+  final bar = tester.widget<NavigationBar>(
+    find.descendant(of: navigation, matching: find.byType(NavigationBar)),
+  );
   expect(bar.selectedIndex, _tabs.indexOf(selectedTab));
   for (final tab in _tabs) {
     expect(
