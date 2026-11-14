@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Body content for unfinished tabs; MainScreen owns the shared navigation.
+/// Body content for unfinished tabs; TeacherShell owns the shared navigation.
 class FeaturePlaceholder extends StatelessWidget {
   const FeaturePlaceholder({super.key, required this.title, this.action});
 

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sts_kehadiran/core/theme.dart';
-import 'package:sts_kehadiran/screens/main_screen.dart';
+import 'package:sts_kehadiran/screens/teacher/teacher_shell.dart';
 import 'package:sts_kehadiran/widgets/dashboard_widgets.dart';
 import 'package:sts_kehadiran/widgets/schedule_widgets.dart';
 
@@ -14,7 +14,7 @@ import 'helpers/test_app.dart';
 /// The dashboard on its own, at a fixed time so "next lesson" is stable.
 Widget _dashboardAt(DateTime time) => MaterialApp(
   theme: AppTheme.light(),
-  home: MainScreen(teacherName: 'Mr. Leong', now: () => time),
+  home: TeacherShell(teacherName: 'Mr. Leong', now: () => time),
 );
 
 DateTime _at(int hour, [int minute = 0]) =>

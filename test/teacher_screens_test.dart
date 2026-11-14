@@ -5,11 +5,11 @@ import 'fakes/fake_auth_service.dart';
 import 'helpers/test_app.dart';
 
 import 'package:sts_kehadiran/core/theme.dart';
-import 'package:sts_kehadiran/screens/attendance_screen.dart';
-import 'package:sts_kehadiran/screens/main_screen.dart';
-import 'package:sts_kehadiran/screens/profile_screen.dart';
-import 'package:sts_kehadiran/screens/students_screen.dart';
-import 'package:sts_kehadiran/screens/timetable_screen.dart';
+import 'package:sts_kehadiran/screens/teacher/attendance_screen.dart';
+import 'package:sts_kehadiran/screens/teacher/teacher_shell.dart';
+import 'package:sts_kehadiran/screens/teacher/profile_screen.dart';
+import 'package:sts_kehadiran/screens/teacher/students_screen.dart';
+import 'package:sts_kehadiran/screens/teacher/timetable_screen.dart';
 
 const _tabs = ['Home', 'Attendance', 'Students', 'Timetable', 'Profile'];
 
@@ -107,7 +107,7 @@ void main() {
       MaterialApp(
         theme: AppTheme.light(),
         navigatorObservers: [observer],
-        home: const MainScreen(teacherName: 'Mr. Leong'),
+        home: const TeacherShell(teacherName: 'Mr. Leong'),
       ),
     );
     final initialPushes = observer.pushes;
@@ -134,7 +134,7 @@ void main() {
       _expectNavigation(tester, tab);
       expect(observer.pushes, initialPushes);
       expect(
-        Navigator.of(tester.element(find.byType(MainScreen))).canPop(),
+        Navigator.of(tester.element(find.byType(TeacherShell))).canPop(),
         isFalse,
       );
       if (tab != 'Home') {
