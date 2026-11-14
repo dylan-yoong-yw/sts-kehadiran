@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme.dart';
-import '../data/mock_schedule.dart';
-import '../models/lesson.dart';
-import '../widgets/dashboard_widgets.dart';
-import '../widgets/fill_scroll_view.dart';
-import '../widgets/schedule_widgets.dart';
+import '../../core/theme.dart';
+import '../../data/mock_schedule.dart';
+import '../../models/lesson.dart';
+import '../../widgets/dashboard_widgets.dart';
+import '../../widgets/fill_scroll_view.dart';
+import '../../widgets/schedule_widgets.dart';
 
 const _days = [
   'Monday',
@@ -31,7 +31,7 @@ const _months = [
   'December',
 ];
 
-/// The teacher's home dashboard (the first tab of [MainScreen]).
+/// The teacher's home dashboard (the first tab of [TeacherShell]).
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key, required this.teacherName, required this.now});
 

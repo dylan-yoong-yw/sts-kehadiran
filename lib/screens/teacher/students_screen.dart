@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/feature_placeholder.dart';
+import '../../widgets/feature_placeholder.dart';
 
 class StudentsScreen extends StatelessWidget {
   const StudentsScreen({super.key});

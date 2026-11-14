@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'core/theme.dart';
 import 'firebase_options.dart';
-import 'screens/auth_gate.dart';
+import 'screens/auth/auth_gate.dart';
 import 'services/auth_service.dart';
 import 'services/profile_service.dart';
 

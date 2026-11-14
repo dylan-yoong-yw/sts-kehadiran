@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sts_kehadiran/models/app_user.dart';
 import 'package:sts_kehadiran/models/teacher_profile.dart';
-import 'package:sts_kehadiran/screens/login_screen.dart';
+import 'package:sts_kehadiran/screens/auth/login_screen.dart';
 
 import 'fakes/fake_auth_service.dart';
 import 'fakes/fake_profile_service.dart';

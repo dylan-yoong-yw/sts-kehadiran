@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sts_kehadiran/core/theme.dart';
-import 'package:sts_kehadiran/screens/login_screen.dart';
-import 'package:sts_kehadiran/screens/main_screen.dart';
-import 'package:sts_kehadiran/screens/sign_up_screen.dart';
+import 'package:sts_kehadiran/screens/auth/login_screen.dart';
+import 'package:sts_kehadiran/screens/teacher/teacher_shell.dart';
+import 'package:sts_kehadiran/screens/auth/sign_up_screen.dart';
 import 'package:sts_kehadiran/services/auth_service.dart';
 
 import 'fakes/fake_auth_service.dart';
@@ -46,7 +46,7 @@ void main() {
   testWidgets('Signed-out users see the login form', (tester) async {
     await pumpApp(tester, FakeAuthService());
     expect(find.byType(LoginScreen), findsOneWidget);
-    expect(find.byType(MainScreen), findsNothing);
+    expect(find.byType(TeacherShell), findsNothing);
     expect(find.text('STS KEHADIRAN'), findsOneWidget);
     expect(find.text('Email'), findsOneWidget);
     expect(find.text('Username'), findsNothing);
@@ -131,7 +131,7 @@ void main() {
 
   testWidgets('Signed-in users go straight to the dashboard', (tester) async {
     await pumpApp(tester, FakeAuthService.signedIn());
-    expect(find.byType(MainScreen), findsOneWidget);
+    expect(find.byType(TeacherShell), findsOneWidget);
     expect(find.byType(LoginScreen), findsNothing);
   });
 
@@ -157,7 +157,7 @@ void main() {
     await pumpApp(tester, FakeAuthService());
     await _fillAndSubmit(tester, email: '  $testEmail  ');
     await tester.pumpAndSettle();
-    expect(find.byType(MainScreen), findsOneWidget);
+    expect(find.byType(TeacherShell), findsOneWidget);
     expect(find.byType(LoginScreen), findsNothing);
     expect(find.text('Hello, Mr. Leong'), findsOneWidget);
   });
@@ -175,7 +175,7 @@ void main() {
     // The error clears on the next attempt.
     await _fillAndSubmit(tester);
     await tester.pumpAndSettle();
-    expect(find.byType(MainScreen), findsOneWidget);
+    expect(find.byType(TeacherShell), findsOneWidget);
   });
 
   testWidgets('Signing in shows progress and blocks double taps', (
@@ -193,7 +193,7 @@ void main() {
 
     service.signInGate!.complete();
     await tester.pumpAndSettle();
-    expect(find.byType(MainScreen), findsOneWidget);
+    expect(find.byType(TeacherShell), findsOneWidget);
   });
 
   testWidgets('Password visibility can be toggled', (tester) async {
@@ -275,14 +275,14 @@ void main() {
 
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
-    expect(find.byType(MainScreen), findsOneWidget);
+    expect(find.byType(TeacherShell), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('sign-out')));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Sign Out'));
     await tester.pumpAndSettle();
     expect(find.byType(LoginScreen), findsOneWidget);
-    expect(find.byType(MainScreen), findsNothing);
+    expect(find.byType(TeacherShell), findsNothing);
   });
 
   for (final size in phoneSizes) {

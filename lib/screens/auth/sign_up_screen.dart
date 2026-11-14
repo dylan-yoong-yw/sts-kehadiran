@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/feature_placeholder.dart';
+import '../../widgets/feature_placeholder.dart';
 
 /// Placeholder until teacher registration is built. Opened from the
 /// "Sign up" link on the login screen.

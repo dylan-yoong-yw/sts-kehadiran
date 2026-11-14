@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../models/app_user.dart';
-import '../models/teacher_profile.dart';
-import '../services/auth_service.dart';
-import '../services/profile_service.dart';
+import '../../models/app_user.dart';
+import '../../models/teacher_profile.dart';
+import '../../services/auth_service.dart';
+import '../../services/profile_service.dart';
 import 'login_screen.dart';
-import 'main_screen.dart';
+import '../teacher/teacher_shell.dart';
 
 /// Shows the login screen when signed out and the dashboard when signed in.
 class AuthGate extends StatefulWidget {
@@ -94,7 +94,7 @@ class _SignedInHomeState extends State<_SignedInHome> {
       final name =
           snapshot.data?.displayName ??
           (authName == null || authName.isEmpty ? 'Teacher' : authName);
-      return MainScreen(teacherName: name);
+      return TeacherShell(teacherName: name);
     },
   );
 }

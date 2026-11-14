@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme.dart';
-import '../services/auth_service.dart';
-import '../widgets/fill_scroll_view.dart';
+import '../../core/theme.dart';
+import '../../services/auth_service.dart';
+import '../../widgets/fill_scroll_view.dart';
 import 'sign_up_screen.dart';
 
 final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');

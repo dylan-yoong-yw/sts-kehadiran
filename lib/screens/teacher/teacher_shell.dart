@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/app_navigation_bar.dart';
+import '../../widgets/app_navigation_bar.dart';
 import 'attendance_screen.dart';
 import 'home_tab.dart';
 import 'profile_screen.dart';
 import 'students_screen.dart';
 import 'timetable_screen.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, this.teacherName = 'Teacher', this.now});
+class TeacherShell extends StatefulWidget {
+  const TeacherShell({super.key, this.teacherName = 'Teacher', this.now});
 
   /// How the signed-in teacher is addressed, e.g. "Mr. Dylan".
   final String teacherName;
@@ -17,10 +17,10 @@ class MainScreen extends StatefulWidget {
   final DateTime Function()? now;
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<TeacherShell> createState() => _TeacherShellState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _TeacherShellState extends State<TeacherShell> {
   int _selectedTab = 0;
 
   void _selectTab(int index) => setState(() => _selectedTab = index);
