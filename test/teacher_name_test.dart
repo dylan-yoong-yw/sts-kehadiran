@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sts_kehadiran/models/app_user.dart';
-import 'package:sts_kehadiran/models/teacher_profile.dart';
+import 'package:sts_kehadiran/models/user_profile.dart';
 import 'package:sts_kehadiran/screens/auth/login_screen.dart';
 
 import 'fakes/fake_auth_service.dart';
@@ -15,38 +15,6 @@ void _expectName(String name) {
 }
 
 void main() {
-  group('TeacherProfile', () {
-    test('combines title and name', () {
-      expect(
-        const TeacherProfile(title: 'Mr.', name: 'Dylan').displayName,
-        'Mr. Dylan',
-      );
-      expect(const TeacherProfile(name: 'Dylan').displayName, 'Dylan');
-    });
-
-    test('reads Firestore data and trims spaces', () {
-      final profile = TeacherProfile.fromMap({
-        'title': ' Mr. ',
-        'name': ' Dylan ',
-      });
-      expect(profile?.displayName, 'Mr. Dylan');
-    });
-
-    test('treats a blank title as no title', () {
-      expect(
-        TeacherProfile.fromMap({'title': '  ', 'name': 'Dylan'})?.displayName,
-        'Dylan',
-      );
-    });
-
-    test('is null without a usable name', () {
-      expect(TeacherProfile.fromMap(null), isNull);
-      expect(TeacherProfile.fromMap({}), isNull);
-      expect(TeacherProfile.fromMap({'title': 'Mr.', 'name': '  '}), isNull);
-      expect(TeacherProfile.fromMap({'name': 42}), isNull);
-    });
-  });
-
   testWidgets('Dashboard greets the signed-in teacher by profile name', (
     tester,
   ) async {
@@ -55,7 +23,11 @@ void main() {
       FakeAuthService(user: _dylan),
       profiles: FakeProfileService(
         profiles: {
-          'dylan-uid': const TeacherProfile(title: 'Mr.', name: 'Dylan'),
+          'dylan-uid': const UserProfile(
+            title: 'Mr.',
+            name: 'Dylan',
+            role: UserRole.teacher,
+          ),
         },
       ),
     );
@@ -68,7 +40,9 @@ void main() {
       tester,
       FakeAuthService(user: _dylan),
       profiles: FakeProfileService(
-        profiles: {'dylan-uid': const TeacherProfile(name: 'Dylan')},
+        profiles: {
+          'dylan-uid': const UserProfile(name: 'Dylan', role: UserRole.teacher),
+        },
       ),
     );
     _expectName('Dylan');
@@ -111,7 +85,11 @@ void main() {
   testWidgets('Editing the profile updates the dashboard', (tester) async {
     final profiles = FakeProfileService(
       profiles: {
-        'dylan-uid': const TeacherProfile(title: 'Mr.', name: 'Dylan'),
+        'dylan-uid': const UserProfile(
+          title: 'Mr.',
+          name: 'Dylan',
+          role: UserRole.teacher,
+        ),
       },
     );
     await pumpApp(tester, FakeAuthService(user: _dylan), profiles: profiles);
@@ -119,7 +97,11 @@ void main() {
 
     profiles.update(
       'dylan-uid',
-      const TeacherProfile(title: 'Dr.', name: 'Dylan Yoong'),
+      const UserProfile(
+        title: 'Dr.',
+        name: 'Dylan Yoong',
+        role: UserRole.teacher,
+      ),
     );
     // One frame delivers the update through the stream, the next shows it.
     await tester.pump();
@@ -133,8 +115,16 @@ void main() {
     final auth = FakeAuthService(user: _dylan);
     final profiles = FakeProfileService(
       profiles: {
-        'dylan-uid': const TeacherProfile(title: 'Mr.', name: 'Dylan'),
-        'teacher-1': const TeacherProfile(title: 'Ms.', name: 'Tan'),
+        'dylan-uid': const UserProfile(
+          title: 'Mr.',
+          name: 'Dylan',
+          role: UserRole.teacher,
+        ),
+        'teacher-1': const UserProfile(
+          title: 'Ms.',
+          name: 'Tan',
+          role: UserRole.teacher,
+        ),
       },
     );
     await pumpApp(tester, auth, profiles: profiles);

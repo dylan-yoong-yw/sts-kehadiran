@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/app_user.dart';
-import '../../models/teacher_profile.dart';
+import '../../models/user_profile.dart';
 import '../../services/auth_service.dart';
 import '../../services/profile_service.dart';
 import 'login_screen.dart';
@@ -78,11 +78,12 @@ class _SignedInHome extends StatefulWidget {
 }
 
 class _SignedInHomeState extends State<_SignedInHome> {
-  late final Stream<TeacherProfile?> _profile = widget.profileService
-      .watchProfile(widget.user.uid);
+  late final Stream<UserProfile?> _profile = widget.profileService.watchProfile(
+    widget.user.uid,
+  );
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<TeacherProfile?>(
+  Widget build(BuildContext context) => StreamBuilder<UserProfile?>(
     stream: _profile,
     builder: (context, snapshot) {
       if (snapshot.hasError) {
