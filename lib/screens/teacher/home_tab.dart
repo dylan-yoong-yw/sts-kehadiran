@@ -5,31 +5,8 @@ import '../../data/mock_schedule.dart';
 import '../../models/lesson.dart';
 import '../../widgets/dashboard_widgets.dart';
 import '../../widgets/fill_scroll_view.dart';
+import '../../widgets/greeting_header.dart';
 import '../../widgets/schedule_widgets.dart';
-
-const _days = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
-const _months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 /// The teacher's home dashboard (the first tab of [TeacherShell]).
 class HomeTab extends StatelessWidget {
@@ -109,26 +86,9 @@ class HomeTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 gap,
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.school,
-                      size: 28,
-                      color: AppColors.darkGreen,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'STS Kehadiran',
-                        style: text.titleLarge?.copyWith(
-                          color: AppColors.darkGreen,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                const AppHeader(),
                 gap,
-                _Greeting(teacherName: teacherName, now: now),
+                GreetingHeader(name: teacherName, now: now),
                 const SizedBox(height: 20),
                 DashboardCard(
                   color: AppColors.attendanceCard,
@@ -229,59 +189,6 @@ class HomeTab extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Greeting extends StatelessWidget {
-  const _Greeting({required this.teacherName, required this.now});
-
-  final String teacherName;
-  final DateTime now;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    final month = _months[now.month - 1];
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Hello, $teacherName', style: text.headlineSmall),
-              const SizedBox(height: 4),
-              Text(
-                '${_days[now.weekday - 1]}, ${now.day} $month ${now.year}',
-                style: text.bodyMedium?.copyWith(color: AppColors.muted),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppColors.dateChip,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Column(
-            children: [
-              const Icon(
-                Icons.calendar_month_outlined,
-                color: AppColors.dateChipIcon,
-              ),
-              Text(
-                '${now.day} ${month.substring(0, 3)}',
-                style: text.labelMedium?.copyWith(
-                  color: AppColors.dateChipText,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
