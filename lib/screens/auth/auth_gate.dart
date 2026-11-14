@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../models/app_user.dart';
-import '../../models/user_profile.dart';
 import '../../services/auth_service.dart';
 import '../../services/profile_service.dart';
 import 'login_screen.dart';
-import '../teacher/teacher_shell.dart';
+import 'role_gate.dart';
 
-/// Shows the login screen when signed out and the dashboard when signed in.
+/// Shows the login screen when signed out, and the [RoleGate] when signed in.
 class AuthGate extends StatefulWidget {
   const AuthGate({
     super.key,
@@ -50,52 +49,14 @@ class _AuthGateState extends State<AuthGate> {
       builder: (context, snapshot) {
         final user = snapshot.data;
         if (user == null) return const LoginScreen();
-        return _SignedInHome(
-          // A new key per account so a different teacher never sees the
-          // previous teacher's name.
+        return RoleGate(
+          // A new key per account so a different user never sees the
+          // previous user's name or interface.
           key: ValueKey(user.uid),
           user: user,
           profileService: widget.profileService,
         );
       },
     ),
-  );
-}
-
-/// Loads the signed-in teacher's profile and shows it on the dashboard.
-class _SignedInHome extends StatefulWidget {
-  const _SignedInHome({
-    super.key,
-    required this.user,
-    required this.profileService,
-  });
-
-  final AppUser user;
-  final ProfileService profileService;
-
-  @override
-  State<_SignedInHome> createState() => _SignedInHomeState();
-}
-
-class _SignedInHomeState extends State<_SignedInHome> {
-  late final Stream<UserProfile?> _profile = widget.profileService.watchProfile(
-    widget.user.uid,
-  );
-
-  @override
-  Widget build(BuildContext context) => StreamBuilder<UserProfile?>(
-    stream: _profile,
-    builder: (context, snapshot) {
-      if (snapshot.hasError) {
-        debugPrint('Could not load teacher profile: ${snapshot.error}');
-      }
-      // Until the profile loads, or if it is missing or unreadable, fall back
-      // to the account's display name, then to "Teacher".
-      final authName = widget.user.displayName?.trim();
-      final name =
-          snapshot.data?.displayName ??
-          (authName == null || authName.isEmpty ? 'Teacher' : authName);
-      return TeacherShell(teacherName: name);
-    },
   );
 }

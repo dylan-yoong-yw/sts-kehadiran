@@ -48,16 +48,24 @@ void main() {
     _expectName('Dylan');
   });
 
-  testWidgets('A missing profile falls back to "Teacher"', (tester) async {
+  // A missing or unreadable profile no longer falls back to the teacher
+  // dashboard: without a role the app cannot tell teachers from admins.
+  // Those cases are covered in role_gate_test.dart.
+
+  testWidgets('A teacher profile without a name falls back to "Teacher"', (
+    tester,
+  ) async {
     await pumpApp(
       tester,
       FakeAuthService(user: _dylan),
-      profiles: FakeProfileService(defaultProfile: null),
+      profiles: FakeProfileService(
+        defaultProfile: const UserProfile(role: UserRole.teacher),
+      ),
     );
     _expectName('Teacher');
   });
 
-  testWidgets('A missing profile uses the account display name if set', (
+  testWidgets('A teacher profile without a name uses the account name', (
     tester,
   ) async {
     await pumpApp(
@@ -65,21 +73,11 @@ void main() {
       FakeAuthService(
         user: const AppUser(uid: 'u1', displayName: 'Cikgu Aminah'),
       ),
-      profiles: FakeProfileService(defaultProfile: null),
+      profiles: FakeProfileService(
+        defaultProfile: const UserProfile(role: UserRole.teacher),
+      ),
     );
     _expectName('Cikgu Aminah');
-  });
-
-  testWidgets('An unreadable profile still shows the dashboard', (
-    tester,
-  ) async {
-    await pumpApp(
-      tester,
-      FakeAuthService(user: _dylan),
-      profiles: FakeProfileService(error: Exception('permission-denied')),
-    );
-    _expectName('Teacher');
-    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Editing the profile updates the dashboard', (tester) async {

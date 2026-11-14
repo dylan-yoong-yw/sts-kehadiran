@@ -1,9 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'core/theme.dart';
 import 'firebase_options.dart';
 import 'screens/auth/auth_gate.dart';
+import 'services/admin_agenda_service.dart';
 import 'services/auth_service.dart';
 import 'services/profile_service.dart';
 
@@ -23,17 +25,24 @@ class MyApp extends StatelessWidget {
     super.key,
     required this.authService,
     required this.profileService,
+    this.adminAgendaService = const MockAdminAgendaService(),
   });
 
   final AuthService authService;
   final ProfileService profileService;
 
+  /// Sample counts until attendance registers are stored (FR-05, FR-08).
+  final AdminAgendaService adminAgendaService;
+
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: 'STS Kehadiran',
-    debugShowCheckedModeBanner: false,
-    theme: AppTheme.light(),
-    home: AuthGate(authService: authService, profileService: profileService),
+  Widget build(BuildContext context) => Provider<AdminAgendaService>.value(
+    value: adminAgendaService,
+    child: MaterialApp(
+      title: 'STS Kehadiran',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light(),
+      home: AuthGate(authService: authService, profileService: profileService),
+    ),
   );
 }
 
