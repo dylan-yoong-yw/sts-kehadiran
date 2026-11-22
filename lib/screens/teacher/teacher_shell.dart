@@ -8,10 +8,18 @@ import 'students_screen.dart';
 import 'timetable_screen.dart';
 
 class TeacherShell extends StatefulWidget {
-  const TeacherShell({super.key, this.teacherName = 'Teacher', this.now});
+  const TeacherShell({
+    super.key,
+    this.teacherName = 'Teacher',
+    this.hasClasses = true,
+    this.now,
+  });
 
   /// How the signed-in teacher is addressed, e.g. "Mr. Dylan".
   final String teacherName;
+
+  /// False until an admin assigns the teacher a class (`classIds` empty).
+  final bool hasClasses;
 
   /// Clock for the date and next lesson; overridable in tests.
   final DateTime Function()? now;
@@ -35,6 +43,7 @@ class _TeacherShellState extends State<TeacherShell> {
           children: [
             HomeTab(
               teacherName: widget.teacherName,
+              hasClasses: widget.hasClasses,
               now: (widget.now ?? DateTime.now)(),
             ),
             const AttendanceScreen(),

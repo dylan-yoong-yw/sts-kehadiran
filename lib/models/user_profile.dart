@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// Which interface a signed-in user sees (FR-01).
 enum UserRole {
   teacher,
@@ -18,16 +20,26 @@ enum UserRole {
 
 /// A user's details, stored in Firestore at `users/{uid}`.
 ///
-/// Fields: `title` (e.g. "Mr."), `name` (e.g. "Adam") and `role`
-/// ("teacher" or "admin"). Documents are created in the Firebase console.
+/// Fields: `title` (e.g. "Mr."), `name` (e.g. "Adam"), `role` ("teacher" or
+/// "admin") and `classIds` (the classes an admin has assigned). Teachers
+/// create their own document at sign-up; admins are set up in the Firebase
+/// console.
 class UserProfile {
-  const UserProfile({this.name, this.title, this.role});
+  const UserProfile({
+    this.name,
+    this.title,
+    this.role,
+    this.classIds = const [],
+  });
 
   final String? name;
   final String? title;
 
   /// Null when the document has no role, or one the app does not know.
   final UserRole? role;
+
+  /// Classes assigned by an admin; empty for a newly signed-up teacher.
+  final List<String> classIds;
 
   /// How the user is addressed, e.g. "Mr. Adam", "Adam" without a title,
   /// or null without a name.
@@ -39,7 +51,7 @@ class UserProfile {
   }
 
   /// Reads a `users/{uid}` document. Blank or non-text fields count as
-  /// missing.
+  /// missing, and blank or non-text class ids are skipped.
   factory UserProfile.fromMap(Map<String, dynamic> data) {
     String? text(String key) {
       final value = data[key];
@@ -52,6 +64,13 @@ class UserProfile {
       name: text('name'),
       title: text('title'),
       role: UserRole.parse(data['role']),
+      classIds: switch (data['classIds']) {
+        final List<dynamic> ids => [
+          for (final id in ids)
+            if (id is String && id.trim().isNotEmpty) id.trim(),
+        ],
+        _ => const [],
+      },
     );
   }
 
@@ -60,8 +79,9 @@ class UserProfile {
       other is UserProfile &&
       other.name == name &&
       other.title == title &&
-      other.role == role;
+      other.role == role &&
+      listEquals(other.classIds, classIds);
 
   @override
-  int get hashCode => Object.hash(name, title, role);
+  int get hashCode => Object.hash(name, title, role, Object.hashAll(classIds));
 }

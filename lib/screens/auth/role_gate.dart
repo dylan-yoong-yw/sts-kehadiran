@@ -54,6 +54,7 @@ class _RoleSwitch extends StatelessWidget {
       ProfileStatus.loaded => switch (profile?.role) {
         UserRole.teacher => TeacherShell(
           teacherName: _nameFor(profile!, 'Teacher'),
+          hasClasses: profile.classIds.isNotEmpty,
         ),
         UserRole.admin => AdminShell(adminName: _nameFor(profile!, 'Admin')),
         null => const AccountNotSetUpScreen(),

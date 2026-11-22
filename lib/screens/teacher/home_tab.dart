@@ -10,10 +10,19 @@ import '../../widgets/schedule_widgets.dart';
 
 /// The teacher's home dashboard (the first tab of [TeacherShell]).
 class HomeTab extends StatelessWidget {
-  const HomeTab({super.key, required this.teacherName, required this.now});
+  const HomeTab({
+    super.key,
+    required this.teacherName,
+    required this.now,
+    this.hasClasses = true,
+  });
 
   final String teacherName;
   final DateTime now;
+
+  /// When false, Today's Attendance says no classes are assigned yet and
+  /// hides Take Attendance.
+  final bool hasClasses;
 
   static void showNotImplemented(BuildContext context, String feature) {
     ScaffoldMessenger.of(context)
@@ -103,26 +112,30 @@ class HomeTab extends StatelessWidget {
                         style: text.bodySmall?.copyWith(color: AppColors.muted),
                       ),
                       const SizedBox(height: 8),
-                      for (final item in MockSchedule.classes)
-                        ClassAttendanceRow(attendance: item),
-                      const SizedBox(height: 12),
-                      FilledButton(
-                        style: AppTheme.primaryButton,
-                        onPressed: () => _selectClass(context),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                'Take Attendance',
-                                textAlign: TextAlign.center,
+                      if (!hasClasses)
+                        const _NoClassesMessage()
+                      else ...[
+                        for (final item in MockSchedule.classes)
+                          ClassAttendanceRow(attendance: item),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          style: AppTheme.primaryButton,
+                          onPressed: () => _selectClass(context),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  'Take Attendance',
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.north_east, size: 22),
-                          ],
+                              SizedBox(width: 8),
+                              Icon(Icons.north_east, size: 22),
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -188,6 +201,41 @@ class HomeTab extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Today's Attendance for a teacher whose `classIds` is empty (FR-01).
+class _NoClassesMessage extends StatelessWidget {
+  const _NoClassesMessage();
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return Padding(
+      key: const Key('no-classes'),
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info_outline_rounded, color: AppColors.darkGreen),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('No classes assigned yet', style: text.titleSmall),
+                const SizedBox(height: 4),
+                Text(
+                  'Your school admin will assign your classes. They will '
+                  'appear here once they have.',
+                  style: text.bodyMedium?.copyWith(color: AppColors.muted),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

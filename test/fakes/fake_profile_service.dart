@@ -7,6 +7,7 @@ const teacherLeong = UserProfile(
   title: 'Mr.',
   name: 'Leong',
   role: UserRole.teacher,
+  classIds: ['1-amanah', '3-bestari'],
 );
 const adminAdam = UserProfile(title: 'Mr.', name: 'Adam', role: UserRole.admin);
 

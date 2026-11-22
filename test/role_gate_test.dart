@@ -56,6 +56,42 @@ void main() {
     expect(find.text('Take Attendance'), findsOneWidget);
   });
 
+  testWidgets('A teacher with no classes sees "No classes assigned yet"', (
+    tester,
+  ) async {
+    final profiles = FakeProfileService(
+      profiles: {
+        _uid: const UserProfile(
+          title: 'Ms.',
+          name: 'Aina',
+          role: UserRole.teacher,
+        ),
+      },
+    );
+    await pumpApp(tester, FakeAuthService(user: _signedIn), profiles: profiles);
+    _expectTeacher();
+    expect(find.text('Hello, Ms. Aina'), findsOneWidget);
+    expect(find.text('Today’s Attendance'), findsOneWidget);
+    expect(find.text('No classes assigned yet'), findsOneWidget);
+    expect(find.text('Take Attendance'), findsNothing);
+    // The sample schedule card stays until timetables are stored.
+    expect(find.text('Today’s Schedule'), findsOneWidget);
+
+    // Classes assigned by an admin appear without signing in again.
+    profiles.update(
+      _uid,
+      const UserProfile(
+        title: 'Ms.',
+        name: 'Aina',
+        role: UserRole.teacher,
+        classIds: ['1-amanah'],
+      ),
+    );
+    await _deliver(tester);
+    expect(find.text('No classes assigned yet'), findsNothing);
+    expect(find.text('Take Attendance'), findsOneWidget);
+  });
+
   testWidgets('An admin sees the admin interface', (tester) async {
     await pumpApp(
       tester,
@@ -217,6 +253,21 @@ void main() {
   });
 
   for (final size in phoneSizes) {
+    testWidgets('"No classes assigned yet" has no overflow at $size, text x2', (
+      tester,
+    ) async {
+      setScreen(tester, size, textScale: 2);
+      await pumpApp(
+        tester,
+        FakeAuthService(user: _signedIn),
+        profiles: FakeProfileService(
+          profiles: {_uid: const UserProfile(role: UserRole.teacher)},
+        ),
+      );
+      expect(find.byKey(const Key('no-classes')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('Account screens have no overflow at $size, text x2', (
       tester,
     ) async {

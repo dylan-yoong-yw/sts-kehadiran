@@ -36,6 +36,50 @@ void main() {
     });
   });
 
+  group('UserProfile.classIds', () {
+    test('reads the assigned class ids, trimming spaces', () {
+      final profile = UserProfile.fromMap({
+        'classIds': [' 1-amanah ', '3-bestari'],
+      });
+      expect(profile.classIds, ['1-amanah', '3-bestari']);
+    });
+
+    test('is empty when missing, empty or not a list', () {
+      for (final value in [null, <String>[], 'class-1', 42]) {
+        expect(
+          UserProfile.fromMap({'classIds': value}).classIds,
+          isEmpty,
+          reason: '$value',
+        );
+      }
+      expect(const UserProfile().classIds, isEmpty);
+    });
+
+    test('skips blank and non-text ids', () {
+      expect(
+        UserProfile.fromMap({
+          'classIds': ['1-amanah', '', '  ', 7, null],
+        }).classIds,
+        ['1-amanah'],
+      );
+    });
+
+    test('takes part in equality, so a newly assigned class is noticed', () {
+      expect(
+        const UserProfile(name: 'A', classIds: ['x']),
+        const UserProfile(name: 'A', classIds: ['x']),
+      );
+      expect(
+        const UserProfile(name: 'A', classIds: ['x']).hashCode,
+        const UserProfile(name: 'A', classIds: ['x']).hashCode,
+      );
+      expect(
+        const UserProfile(name: 'A'),
+        isNot(const UserProfile(name: 'A', classIds: ['x'])),
+      );
+    });
+  });
+
   group('UserRole.parse', () {
     test('reads teacher and admin, ignoring case and spaces', () {
       expect(UserRole.parse('teacher'), UserRole.teacher);
