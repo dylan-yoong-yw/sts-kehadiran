@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
+import '../../core/validators.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/fill_scroll_view.dart';
 import 'sign_up_screen.dart';
-
-final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -27,15 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  String? _validateEmail(String? value) {
-    final email = value?.trim() ?? '';
-    if (email.isEmpty) return 'Please enter your email.';
-    if (!_emailPattern.hasMatch(email)) {
-      return 'Please enter a valid email address.';
-    }
-    return null;
   }
 
   Future<void> _signIn() async {
@@ -70,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final email = _emailController.text.trim();
-    if (_validateEmail(email) != null) {
+    if (validateEmail(email) != null) {
       show('Enter your email above, then tap “Forgot password?” again.');
       return;
     }
@@ -178,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
             autofillHints: const [AutofillHints.email],
             autocorrect: false,
             decoration: const InputDecoration(labelText: 'Email'),
-            validator: _validateEmail,
+            validator: validateEmail,
           ),
           const SizedBox(height: AppSpacing.section),
           TextFormField(
