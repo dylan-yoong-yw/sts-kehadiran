@@ -3,7 +3,8 @@ import 'package:flutter/widgets.dart';
 
 import '../models/app_user.dart';
 
-/// A sign-in failure with a message that is safe to show to the user.
+/// A sign-in or sign-up failure with a message that is safe to show to the
+/// user. It never carries Firebase's own error text.
 class AuthException implements Exception {
   const AuthException(this.message);
 
@@ -28,6 +29,17 @@ abstract class AuthService {
 
   /// Throws [AuthException] when the reset email cannot be requested.
   Future<void> sendPasswordReset(String email);
+
+  /// Creates an email/password account and signs it in (FR-01). Throws
+  /// [AuthException] when the account cannot be created.
+  Future<AppUser> createAccount({
+    required String email,
+    required String password,
+  });
+
+  /// Deletes the signed-in account. Used only to undo a sign-up whose
+  /// profile could not be saved.
+  Future<void> deleteCurrentUser();
 
   Future<void> signOut();
 }
@@ -58,7 +70,7 @@ class FirebaseAuthService implements AuthService {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (error) {
-      throw AuthException(_messageFor(error.code));
+      throw AuthException(messageFor(error.code));
     }
   }
 
@@ -69,15 +81,45 @@ class FirebaseAuthService implements AuthService {
     } on FirebaseAuthException catch (error) {
       // Don't reveal whether an account exists for this email.
       if (error.code == 'user-not-found') return;
-      throw AuthException(_messageFor(error.code));
+      throw AuthException(messageFor(error.code));
     }
   }
 
   @override
+  Future<AppUser> createAccount({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final user = _toAppUser(credential.user);
+      if (user == null) throw const AuthException(genericMessage);
+      return user;
+    } on FirebaseAuthException catch (error) {
+      throw AuthException(messageFor(error.code));
+    }
+  }
+
+  @override
+  Future<void> deleteCurrentUser() async => _auth.currentUser?.delete();
+
+  @override
   Future<void> signOut() => _auth.signOut();
 
-  static String _messageFor(String code) => switch (code) {
+  static const genericMessage = 'Something went wrong. Please try again.';
+
+  /// A friendly message for a Firebase Auth error [code].
+  @visibleForTesting
+  static String messageFor(String code) => switch (code) {
     'invalid-email' => 'That email address doesn’t look right.',
+    'email-already-in-use' =>
+      'An account with this email already exists. Try logging in instead.',
+    'weak-password' =>
+      'That password is too weak. Use at least 8 characters, mixing '
+          'letters and numbers.',
     'user-disabled' =>
       'This account has been disabled. Please contact your school admin.',
     'invalid-credential' ||
@@ -87,7 +129,7 @@ class FirebaseAuthService implements AuthService {
       'Too many attempts. Please wait a moment and try again.',
     'network-request-failed' =>
       'No internet connection. Please check your network and try again.',
-    _ => 'Something went wrong. Please try again.',
+    _ => genericMessage,
   };
 }
 

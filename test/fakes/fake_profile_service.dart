@@ -35,12 +35,44 @@ class FakeProfileService implements ProfileService {
   /// How many times a profile stream has been opened.
   int reads = 0;
 
+  /// When set, creating a teacher profile fails with this error.
+  Object? createError;
+
+  /// When set, creating a teacher profile waits for this (e.g. to time out).
+  Completer<void>? createGate;
+
+  /// Profiles created at sign-up, as the Firestore fields written, with
+  /// [serverTime] standing in for the server timestamp.
+  final created = <String, Map<String, Object>>{};
+
+  static const serverTime = 'SERVER_TIMESTAMP';
+
   final _updates = StreamController<(String, UserProfile?)>.broadcast();
 
   /// Simulates the profile being edited in Firestore.
   void update(String uid, UserProfile? profile) {
     profiles[uid] = profile;
     _updates.add((uid, profile));
+  }
+
+  @override
+  Future<void> createTeacherProfile({
+    required String uid,
+    required String title,
+    required String name,
+    required String email,
+  }) async {
+    await createGate?.future;
+    final failure = createError;
+    if (failure != null) throw failure;
+    final data = teacherProfileData(
+      title: title,
+      name: name,
+      email: email,
+      createdAt: serverTime,
+    );
+    created[uid] = data;
+    update(uid, UserProfile.fromMap(data));
   }
 
   @override

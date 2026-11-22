@@ -26,6 +26,25 @@ class FakeAuthService implements AuthService {
   final resetRequests = <String>[];
   int signInAttempts = 0;
 
+  /// When set, the next sign-up waits for this to complete (to test loading).
+  Completer<void>? createAccountGate;
+
+  /// When set, creating an account fails with this error.
+  AuthException? createAccountError;
+
+  /// When set, deleting the signed-in account fails with this error.
+  Object? deleteError;
+
+  /// Emails of accounts created, in order.
+  final createdAccounts = <String>[];
+
+  /// Uids of accounts deleted, in order.
+  final deletedUids = <String>[];
+  int signOutCalls = 0;
+
+  /// The uid given to the next account created.
+  String newUid = 'new-teacher-1';
+
   @override
   AppUser? get currentUser => user;
 
@@ -55,5 +74,32 @@ class FakeAuthService implements AuthService {
   }
 
   @override
-  Future<void> signOut() async => _emit(null);
+  Future<AppUser> createAccount({
+    required String email,
+    required String password,
+  }) async {
+    await createAccountGate?.future;
+    final error = createAccountError;
+    if (error != null) throw error;
+    createdAccounts.add(email);
+    final created = AppUser(uid: newUid, email: email);
+    _emit(created);
+    return created;
+  }
+
+  @override
+  Future<void> deleteCurrentUser() async {
+    final error = deleteError;
+    if (error != null) throw error;
+    final current = user;
+    if (current == null) return;
+    deletedUids.add(current.uid);
+    _emit(null);
+  }
+
+  @override
+  Future<void> signOut() async {
+    signOutCalls++;
+    _emit(null);
+  }
 }
