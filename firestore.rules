@@ -2,13 +2,62 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Teacher profiles: each signed-in teacher can read only their own.
-    // Profiles are created and edited in the Firebase console for now.
-    match /users/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if false;
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
     }
 
-    // Everything else stays locked until it is needed.
+    // The titles offered on the sign-up screen (lib/core/validators.dart).
+    function validTitle(title) {
+      return title in ['Mr.', 'Ms.', 'Mdm.', 'Dr.'];
+    }
+
+    // 1 to 100 characters, with no leading or trailing spaces.
+    function validName(name) {
+      return name is string
+        && name.size() > 0
+        && name.size() <= 100
+        && name.trim() == name;
+    }
+
+    // Fields that this request adds, removes or changes.
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    // User profiles (FR-01). Teachers create their own at sign-up; admins
+    // are set up, and classes assigned, in the Firebase console, which
+    // these rules do not restrict.
+    match /users/{uid} {
+      // Each user can read only their own profile.
+      allow read: if isOwner(uid);
+
+      // Sign-up: only for your own uid, only as a teacher with no classes,
+      // with exactly the fields the app writes.
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(
+             ['title', 'name', 'email', 'role', 'classIds', 'createdAt'])
+        && request.resource.data.keys().hasAll(
+             ['title', 'name', 'email', 'role', 'classIds', 'createdAt'])
+        && request.resource.data.role == 'teacher'
+        && request.resource.data.classIds is list
+        && request.resource.data.classIds.size() == 0
+        && validTitle(request.resource.data.title)
+        && validName(request.resource.data.name)
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.createdAt == request.time;
+
+      // Users may change only their own title and name; never role,
+      // classIds, email or createdAt.
+      allow update: if isOwner(uid)
+        && changedKeys().hasOnly(['title', 'name'])
+        && (!('title' in changedKeys()) || validTitle(request.resource.data.title))
+        && (!('name' in changedKeys()) || validName(request.resource.data.name));
+
+      // Deleting a profile is left to admins in the console.
+      allow delete: if false;
+    }
+
+    // Everything else stays denied until it is needed.
   }
 }
