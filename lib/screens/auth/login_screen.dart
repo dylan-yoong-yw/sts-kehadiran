@@ -4,6 +4,7 @@ import '../../core/theme.dart';
 import '../../core/validators.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/fill_scroll_view.dart';
+import '../../widgets/form_error_banner.dart';
 import 'sign_up_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -199,28 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: AppSpacing.section),
           if (_error != null) ...[
-            Container(
-              key: const Key('login-error'),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppColors.errorBackground,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.error_outline, color: AppColors.error),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      _error!,
-                      style: text.bodyMedium?.copyWith(
-                        color: AppColors.errorText,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            FormErrorBanner(key: const Key('login-error'), message: _error!),
             const SizedBox(height: AppSpacing.section),
           ],
           FilledButton(

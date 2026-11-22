@@ -8,6 +8,7 @@ import 'screens/auth/auth_gate.dart';
 import 'services/admin_agenda_service.dart';
 import 'services/auth_service.dart';
 import 'services/profile_service.dart';
+import 'services/sign_up_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,8 +36,14 @@ class MyApp extends StatelessWidget {
   final AdminAgendaService adminAgendaService;
 
   @override
-  Widget build(BuildContext context) => Provider<AdminAgendaService>.value(
-    value: adminAgendaService,
+  Widget build(BuildContext context) => MultiProvider(
+    providers: [
+      Provider<AdminAgendaService>.value(value: adminAgendaService),
+      Provider<SignUpService>(
+        create: (_) =>
+            SignUpService(auth: authService, profiles: profileService),
+      ),
+    ],
     child: MaterialApp(
       title: 'STS Kehadiran',
       debugShowCheckedModeBanner: false,

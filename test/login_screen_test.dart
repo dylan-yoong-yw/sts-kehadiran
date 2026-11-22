@@ -210,7 +210,7 @@ void main() {
     expect(field().obscureText, isTrue);
   });
 
-  testWidgets('Sign up opens the registration placeholder and back returns', (
+  testWidgets('Sign up opens the sign-up form and back returns', (
     tester,
   ) async {
     await pumpApp(tester, FakeAuthService());
@@ -218,7 +218,7 @@ void main() {
     await tester.tap(_signUp);
     await tester.pumpAndSettle();
     expect(find.byType(SignUpScreen), findsOneWidget);
-    expect(find.text('Sign up is under development.'), findsOneWidget);
+    expect(find.text('Create your account'), findsOneWidget);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
